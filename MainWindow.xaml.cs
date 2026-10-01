@@ -11,8 +11,8 @@ namespace DDTM_DSFixUI
 {
     public partial class MainWindow : Window
     {
-        private string dsfixPath = "DSfix.ini";
-        private string dsfixKeysPath = "DSfixKeys.ini";
+        private string dsfixPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DSfix.ini");
+        private string dsfixKeysPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DSfixKeys.ini");
         private string darkSoulsIniPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"NBGI\DarkSouls\DarkSouls.ini");
 
         private double screenWidth = SystemParameters.PrimaryScreenWidth;
@@ -492,20 +492,25 @@ namespace DDTM_DSFixUI
                 $"reloadSSAOEffect={txtKeyReloadSSAO.Text}|{chkKeyReloadSSAO.IsChecked}",
                 $"togglePaused={txtKeyTogglePaused.Text}|{chkKeyTogglePaused.IsChecked}"
             };
+            
+            string localConfigPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DDTM_DSFixUI_LocalConfig.txt");
 
-            File.WriteAllLines("DDTM_DSFixUI_LocalConfig.txt", localConfig);
+            File.WriteAllLines(localConfigPath, localConfig);
             MessageBox.Show("Local configuration saved.", "Local Save", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void MenuLoadLocal_Click(object sender, RoutedEventArgs e)
         {
-            if (!File.Exists("DDTM_DSFixUI_LocalConfig.txt"))
+            string localConfigPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DDTM_DSFixUI_LocalConfig.txt");
+
+            if (!File.Exists(localConfigPath))
             {
                 MessageBox.Show("No local configuration saved.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            string[] lines = File.ReadAllLines("DDTM_DSFixUI_LocalConfig.txt");
+            string[] lines = File.ReadAllLines(localConfigPath);
+
             string rW = "1920", rH = "1080";
             string pW = "0", pH = "0";
 
@@ -749,8 +754,10 @@ namespace DDTM_DSFixUI
 
         private void BtnLaunchGame_Click(object sender, RoutedEventArgs e)
         {
-            if (File.Exists("DARKSOULS.exe"))
-                System.Diagnostics.Process.Start("DARKSOULS.exe");
+            string gameExePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DARKSOULS.exe");
+
+            if (File.Exists(gameExePath))
+                System.Diagnostics.Process.Start(gameExePath);
             else
                 MessageBox.Show("DARKSOULS.exe was not found in the current folder.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
