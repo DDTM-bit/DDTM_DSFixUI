@@ -769,9 +769,9 @@ namespace DDTM_DSFixUI
 
             if (int.TryParse(txtFpsLimit.Text, out int value))
             {
-                if (value > 60)
+                if (value > 140)
                 {
-                    txtFpsLimit.Text = "60";
+                    txtFpsLimit.Text = "140";
                     txtFpsLimit.CaretIndex = txtFpsLimit.Text.Length;
                 }
                 else if (value < 1)
@@ -788,9 +788,9 @@ namespace DDTM_DSFixUI
 
             if (int.TryParse(txtFpsThreshold.Text, out int value))
             {
-                if (value > 60)
+                if (value > 140)
                 {
-                    txtFpsThreshold.Text = "60";
+                    txtFpsThreshold.Text = "140";
                     txtFpsThreshold.CaretIndex = txtFpsThreshold.Text.Length;
                 }
                 else if (value < 1)

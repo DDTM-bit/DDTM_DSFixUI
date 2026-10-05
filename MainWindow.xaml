@@ -119,7 +119,7 @@
                         <WrapPanel>
                             <CheckBox Name="chkUnlockFPS" Content="Unlock FPS" Foreground="White" Margin="5,5,15,5" IsChecked="True" ToolTip="Enables variable framerate." Unchecked="chkUnlockFPS_Unchecked"/>
                             <Label Content="FPS Limit:"/>
-                            <TextBox Name="txtFpsLimit" Width="50" Text="60" Margin="0,0,15,0" ToolTip="Cap framerate. Maximum is 60." TextChanged="TxtFpsLimit_TextChanged"/>
+                            <TextBox Name="txtFpsLimit" Width="50" Text="60" Margin="0,0,15,0" ToolTip="Cap framerate. Maximum recommended is 140." TextChanged="TxtFpsLimit_TextChanged"/>
                             <Label Content="FPS Threshold:"/>
                             <TextBox Name="txtFpsThreshold" Width="50" Text="20" ToolTip="Dynamically disables AA if framerate drops below this."/>
                         </WrapPanel>
