@@ -216,7 +216,7 @@
                         <CheckBox Name="chkMinimalHud" Content="Enable Minimal HUD" Foreground="White" Margin="0,5,0,0" ToolTip="Removes weapon icons from the Bottom HUD." Height="25"/>
                         <Separator x:Name="sep1" Height="26" Background="#FF736554" Margin="0,5"/>
                         <Label Width="700" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="#FFFF5F5F" Margin="0,0,0,10">
-                            <TextBlock TextWrapping="Wrap" Text="WARNING: Independent HUD scaling is experimental. This will break Boss Health Bars and Dialogue boxes due to game engine limitations. Change at your own risk." />
+                            <TextBlock TextWrapping="Wrap" Text="WARNING: Independent HUD scaling is experimental. This will break Boss Health Bars, Dialogue boxes, interaction with sun/moon due to game engine limitations. Change at your own risk." />
                         </Label>
                         <!-- HUD Scaling -->
                         <TextBlock x:Name="txtblockhud1" Text="HUD Scaling (1.0 = Default | 0.75 = 75% | 0.5 = 50%)" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,5,0,5"/>
