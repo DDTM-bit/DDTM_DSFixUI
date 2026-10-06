@@ -323,7 +323,7 @@ namespace DDTM_DSFixUI
             {
             
                 chkUnlockFPS.IsChecked = true;
-                txtFpsLimit.Text = "30";
+                txtFpsLimit.Text = "60";
                 txtFpsThreshold.Text = "20";
                 cmbAaType.Text = "SMAA";
                 cmbAaQuality.SelectedIndex = 4;
