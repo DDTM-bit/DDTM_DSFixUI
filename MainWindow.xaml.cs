@@ -1,7 +1,8 @@
-﻿using System.IO;
+using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
+using System.Globalization;
 
 namespace DDTM_DSFixUI
 {
@@ -45,9 +46,6 @@ namespace DDTM_DSFixUI
             txtBackupInterval.PreviewTextInput += NumericOnly_PreviewTextInput;
             txtMaxBackups.PreviewTextInput += NumericOnly_PreviewTextInput;
 
-            txtHudScaleTopLeft.PreviewTextInput += NumericAndPointOnly_PreviewTextInput;
-            txtHudScaleBottomLeft.PreviewTextInput += NumericAndPointOnly_PreviewTextInput;
-            txtHudScaleBottomRight.PreviewTextInput += NumericAndPointOnly_PreviewTextInput;
             txtHudTopLeftOpacity.PreviewTextInput += NumericAndPointOnly_PreviewTextInput;
             txtHudBottomLeftOpacity.PreviewTextInput += NumericAndPointOnly_PreviewTextInput;
             txtHudBottomRightOpacity.PreviewTextInput += NumericAndPointOnly_PreviewTextInput;
@@ -64,33 +62,47 @@ namespace DDTM_DSFixUI
 
         private void PopulateResolutions()
         {
-            // List of standard resolutions from 640x480 up to 4K
             var resolutions = new[] {
-        (640, 480), (800, 600), (1024, 768), (1280, 720),
-        (1366, 768), (1600, 900), (1920, 1080), (2560, 1440), (3840, 2160)
+        // 4:3 / 5:4
+        (640, 480), (800, 600), (1024, 768), (1280, 1024),
+        // 16:9
+        (1280, 720), (1366, 768), (1600, 900), (1920, 1080), (2560, 1440), (3840, 2160),
+        // 16:10 (1280x800 is the Steam Deck)
+        (1280, 800), (1440, 900), (1680, 1050), (1920, 1200), (2560, 1600), (3840, 2400),
+        // Ultrawide 21:9
+        (2560, 1080), (3440, 1440), (3840, 1600),
+        // Super ultrawide 32:9
+        (3840, 1080), (5120, 1440)
     };
+
+            // Sort by total pixels so the list reads from small to large
+            var sorted = resolutions.OrderBy(r => r.Item1 * r.Item2).ThenBy(r => r.Item1).ToList();
 
             cmbPresentResolution.Items.Add(new System.Windows.Controls.ComboBoxItem { Content = "0x0" });
 
-            foreach (var res in resolutions)
+            foreach (var res in sorted)
             {
                 string resString = $"{res.Item1}x{res.Item2}";
 
-                // Add to Downscaling (all available)
+                // Present (downscaling): all resolutions
                 cmbPresentResolution.Items.Add(new System.Windows.Controls.ComboBoxItem { Content = resString });
 
-                // Add to Render (Only if within PC screen limits)
+                // Render: only resolutions that fit the PC screen
                 if (res.Item1 <= screenWidth && res.Item2 <= screenHeight)
                 {
                     cmbRenderResolution.Items.Add(new System.Windows.Controls.ComboBoxItem { Content = resString });
                 }
             }
 
-            // Set defaults 
-            if (cmbRenderResolution.Items.Count > 0)
-                cmbRenderResolution.SelectedIndex = cmbRenderResolution.Items.Count - 1; // Highest native resolution by default
+            // Keep the native resolution selectable even if it isn't in the list
+            string native = $"{(int)screenWidth}x{(int)screenHeight}";
+            if (!cmbRenderResolution.Items.Cast<System.Windows.Controls.ComboBoxItem>().Any(i => (string)i.Content == native))
+                cmbRenderResolution.Items.Add(new System.Windows.Controls.ComboBoxItem { Content = native });
 
-            cmbPresentResolution.SelectedIndex = 0; // 0x0 default
+            if (cmbRenderResolution.Items.Count > 0)
+                cmbRenderResolution.SelectedIndex = cmbRenderResolution.Items.Count - 1;
+
+            cmbPresentResolution.SelectedIndex = 0;
         }
 
         private void NumericOnly_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
@@ -245,10 +257,10 @@ namespace DDTM_DSFixUI
                     case "FPSthreshold": txtFpsThreshold.Text = value; break;
 
                     case "enableHudMod": chkEnableHudMod.IsChecked = value == "1"; break;
-                    case "enableMinimalHud": chkMinimalHud.IsChecked = value == "1"; break;
-                    case "hudScaleTopLeft": txtHudScaleTopLeft.Text = value; break;
-                    case "hudScaleBottomLeft": txtHudScaleBottomLeft.Text = value; break;
-                    case "hudScaleBottomRight": txtHudScaleBottomRight.Text = value; break;
+                    case "hudScaleTopLeft": SetSliderByValue(sldHudScaleTopLeft, value); break;
+                    case "hudScaleBottomLeft": SetSliderByValue(sldHudScaleBottomLeft, value); break;
+                    case "hudScaleBottomRight": SetSliderByValue(sldHudScaleBottomRight, value); break;
+                    case "hudScaleBottomCenter": SetSliderByValue(sldHudScaleBottomCenter, value); break;
                     case "hudTopLeftOpacity": txtHudTopLeftOpacity.Text = value; break;
                     case "hudBottomLeftOpacity": txtHudBottomLeftOpacity.Text = value; break;
                     case "hudBottomRightOpacity": txtHudBottomRightOpacity.Text = value; break;
@@ -326,7 +338,7 @@ namespace DDTM_DSFixUI
                 txtFpsLimit.Text = "60";
                 txtFpsThreshold.Text = "20";
                 cmbAaType.Text = "SMAA";
-                cmbAaQuality.SelectedIndex = 4;
+                cmbAaQuality.SelectedIndex = 4; //Ultra
                 cmbSsaoType.Text = "VSSAO2";
                 cmbSsaoStrength.SelectedIndex = 2; // Medium
                 cmbSsaoScale.SelectedIndex = 0; //High quality;     
@@ -356,13 +368,13 @@ namespace DDTM_DSFixUI
                 if (screenWidth == 1024) // 1024x768
                 {
                     cmbRenderResolution.Text = "1024x768";
-                    cmbDofOverrideResolution.Text = "540";
+                    cmbDofOverrideResolution.Text = "0";
                     cmbDofBlurAmount.SelectedIndex = 0; // 0 or 1
                 }
                 else if (screenWidth == 1280) // 1280x720
                 {
                     cmbRenderResolution.Text = "1280x720";
-                    cmbDofOverrideResolution.Text = "540";
+                    cmbDofOverrideResolution.Text = "0";
                     cmbDofBlurAmount.SelectedIndex = 0; // 0 or 1
                 }
                 else if (screenWidth == 1366) // 1366x768
@@ -380,20 +392,50 @@ namespace DDTM_DSFixUI
                 else if (screenWidth == 1920) // 1920x1080
                 {
                     cmbRenderResolution.Text = "1920x1080";
-                    cmbDofOverrideResolution.Text = "810";
+                    cmbDofOverrideResolution.Text = "540";
                     cmbDofBlurAmount.SelectedIndex = 0; // 1 or 2
                 }
                 else if (screenWidth == 2560) // 2560x1440
                 {
                     cmbRenderResolution.Text = "2560x1440";
-                    cmbDofOverrideResolution.Text = "1080";
+                    cmbDofOverrideResolution.Text = "810";
                     cmbDofBlurAmount.SelectedIndex = 1; // 1 or 2
                 }
                 else if (screenWidth >= 3840) // 3840x2160
                 {
                     cmbRenderResolution.Text = "3840x2160";
-                    cmbDofOverrideResolution.Text = "2160";
-                    cmbDofBlurAmount.SelectedIndex = 3; // 3 or 4
+                    cmbDofOverrideResolution.Text = "1080";
+                    cmbDofBlurAmount.SelectedIndex = 2; // 3 or 4
+                }
+                else // any other resolution: 16:10, Steam Deck, ultrawide, etc.
+                {
+                    int w = (int)screenWidth;
+                    int h = (int)screenHeight;
+
+                    // Render resolution = desktop resolution
+                    cmbRenderResolution.Text = $"{w}x{h}";
+
+                    // DoF override: smallest allowed value that is >= half the height and < the height
+                    int[] allowedDof = { 0, 540, 810, 1080, 2160 };
+                    int dof = 0;
+                    foreach (int candidate in allowedDof)
+                    {
+                        if (candidate >= h / 2.0 && candidate < h)
+                        {
+                            dof = candidate;
+                            break; // list is ascending, so this is the closest to half
+                        }
+                    }
+                    cmbDofOverrideResolution.Text = dof.ToString();
+
+                    // Blur amount follows the DoF value
+                    cmbDofBlurAmount.SelectedIndex = dof switch
+                    {
+                        810 => 1,
+                        1080 => 2,
+                        2160 => 3,
+                        _ => 0   // 0 or 540
+                    };
                 }
 
                 TxtPcResolution.Foreground = new SolidColorBrush(Colors.Green);
@@ -444,10 +486,10 @@ namespace DDTM_DSFixUI
                 $"FPSthreshold={txtFpsThreshold.Text}",
 
                 $"enableHudMod={(chkEnableHudMod.IsChecked == true ? "1" : "0")}",
-                $"enableMinimalHud={(chkMinimalHud.IsChecked == true ? "1" : "0")}",
-                $"hudScaleTopLeft={txtHudScaleTopLeft.Text}",
-                $"hudScaleBottomLeft={txtHudScaleBottomLeft.Text}",
-                $"hudScaleBottomRight={txtHudScaleBottomRight.Text}",
+                $"hudScaleTopLeft={GetSliderValue(sldHudScaleTopLeft)}",
+                $"hudScaleBottomLeft={GetSliderValue(sldHudScaleBottomLeft)}",
+                $"hudScaleBottomRight={GetSliderValue(sldHudScaleBottomRight)}",
+                $"hudScaleBottomCenter={GetSliderValue(sldHudScaleBottomCenter)}",
                 $"hudTopLeftOpacity={txtHudTopLeftOpacity.Text}",
                 $"hudBottomLeftOpacity={txtHudBottomLeftOpacity.Text}",
                 $"hudBottomRightOpacity={txtHudBottomRightOpacity.Text}",
@@ -538,10 +580,10 @@ namespace DDTM_DSFixUI
                     case "FPSthreshold": txtFpsThreshold.Text = value; break;
 
                     case "enableHudMod": chkEnableHudMod.IsChecked = value == "1"; break;
-                    case "enableMinimalHud": chkMinimalHud.IsChecked = value == "1"; break;
-                    case "hudScaleTopLeft": txtHudScaleTopLeft.Text = value; break;
-                    case "hudScaleBottomLeft": txtHudScaleBottomLeft.Text = value; break;
-                    case "hudScaleBottomRight": txtHudScaleBottomRight.Text = value; break;
+                    case "hudScaleTopLeft": SetSliderByValue(sldHudScaleTopLeft, value); break;
+                    case "hudScaleBottomLeft": SetSliderByValue(sldHudScaleBottomLeft, value); break;
+                    case "hudScaleBottomRight": SetSliderByValue(sldHudScaleBottomRight, value); break;
+                    case "hudScaleBottomCenter": SetSliderByValue(sldHudScaleBottomCenter, value); break;
                     case "hudTopLeftOpacity": txtHudTopLeftOpacity.Text = value; break;
                     case "hudBottomLeftOpacity": txtHudBottomLeftOpacity.Text = value; break;
                     case "hudBottomRightOpacity": txtHudBottomRightOpacity.Text = value; break;
@@ -645,10 +687,10 @@ namespace DDTM_DSFixUI
                     case "FPSthreshold": lines[i] = $"FPSthreshold {txtFpsThreshold.Text}"; break;
 
                     case "enableHudMod": lines[i] = $"enableHudMod {(chkEnableHudMod.IsChecked == true ? "1" : "0")}"; break;
-                    case "enableMinimalHud": lines[i] = $"enableMinimalHud {(chkMinimalHud.IsChecked == true ? "1" : "0")}"; break;
-                    case "hudScaleTopLeft": lines[i] = $"hudScaleTopLeft {txtHudScaleTopLeft.Text}"; break;
-                    case "hudScaleBottomLeft": lines[i] = $"hudScaleBottomLeft {txtHudScaleBottomLeft.Text}"; break;
-                    case "hudScaleBottomRight": lines[i] = $"hudScaleBottomRight {txtHudScaleBottomRight.Text}"; break;
+                    case "hudScaleTopLeft": lines[i] = $"hudScaleTopLeft {GetSliderValue(sldHudScaleTopLeft)}"; break;
+                    case "hudScaleBottomLeft": lines[i] = $"hudScaleBottomLeft {GetSliderValue(sldHudScaleBottomLeft)}"; break;
+                    case "hudScaleBottomRight": lines[i] = $"hudScaleBottomRight {GetSliderValue(sldHudScaleBottomRight)}"; break;
+                    case "hudScaleBottomCenter": lines[i] = $"hudScaleBottomCenter {GetSliderValue(sldHudScaleBottomCenter)}"; break;
                     case "hudTopLeftOpacity": lines[i] = $"hudTopLeftOpacity {txtHudTopLeftOpacity.Text}"; break;
                     case "hudBottomLeftOpacity": lines[i] = $"hudBottomLeftOpacity {txtHudBottomLeftOpacity.Text}"; break;
                     case "hudBottomRightOpacity": lines[i] = $"hudBottomRightOpacity {txtHudBottomRightOpacity.Text}"; break;
@@ -736,6 +778,20 @@ namespace DDTM_DSFixUI
             labeldsfixsalvat.Visibility = Visibility.Hidden;
         }
 
+        private void SetSliderByValue(System.Windows.Controls.Slider sld, string value)
+        {
+            // The .ini files always use '.' as decimal separator, regardless of the Windows locale
+            if (double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out double v))
+            {
+                sld.Value = Math.Max(sld.Minimum, Math.Min(sld.Maximum, v));
+            }
+        }
+
+        private string GetSliderValue(System.Windows.Controls.Slider sld)
+        {
+            return sld.Value.ToString("0.00", CultureInfo.InvariantCulture);
+        }
+
         private string GetComboBoxValue(System.Windows.Controls.ComboBox cmb)
         {
             if (cmb.SelectedItem == null) return "";
@@ -769,9 +825,9 @@ namespace DDTM_DSFixUI
 
             if (int.TryParse(txtFpsLimit.Text, out int value))
             {
-                if (value > 144)
+                if (value > 120)
                 {
-                    txtFpsLimit.Text = "144";
+                    txtFpsLimit.Text = "120";
                     txtFpsLimit.CaretIndex = txtFpsLimit.Text.Length;
                 }
                 else if (value < 1)
@@ -803,8 +859,7 @@ namespace DDTM_DSFixUI
 
         private void chkEnableHudMod_Checked(object sender, RoutedEventArgs e)
         {
-            if (chkMinimalHud == null) return;
-            chkMinimalHud.Visibility = Visibility.Visible;
+            if (wrappanelhud2 == null) return;
             sep1.Visibility = Visibility.Visible;
             txtblockhud1.Visibility = Visibility.Visible;
             wrappanelhud1.Visibility = Visibility.Visible;
@@ -815,8 +870,7 @@ namespace DDTM_DSFixUI
 
         private void chkEnableHudMod_Unchecked(object sender, RoutedEventArgs e)
         {
-            if (chkMinimalHud == null) return;
-            chkMinimalHud.Visibility = Visibility.Hidden;
+            if (wrappanelhud2 == null) return;
             sep1.Visibility = Visibility.Hidden;
             txtblockhud1.Visibility = Visibility.Hidden;
             wrappanelhud1.Visibility = Visibility.Hidden;
@@ -928,6 +982,11 @@ namespace DDTM_DSFixUI
                         chk.Click += Control_ValueChanged;
                         originalControlColors[chk] = chk.Foreground;
                     }
+                    else if (depChild is System.Windows.Controls.Slider sld)
+                    {
+                        sld.ValueChanged += Control_ValueChanged;
+                        originalControlColors[sld] = sld.Foreground;
+                    }
 
                     SetupChangeTracking(depChild); // Recursively search inside tabs/panels
                 }
@@ -955,6 +1014,11 @@ namespace DDTM_DSFixUI
                         originalControlValues[chk] = chk.IsChecked.ToString();
                         chk.Foreground = originalControlColors[chk];
                     }
+                    else if (depChild is System.Windows.Controls.Slider sld)
+                    {
+                        originalControlValues[sld] = GetSliderValue(sld);
+                        ApplySliderBrush(sld, originalControlColors[sld]);
+                    }
                     SnapshotCurrentValues(depChild);
                 }
             }
@@ -975,16 +1039,22 @@ namespace DDTM_DSFixUI
             if (ctrl is System.Windows.Controls.TextBox txt) currentValue = txt.Text;
             else if (ctrl is System.Windows.Controls.ComboBox cmb) currentValue = cmb.Text;
             else if (ctrl is System.Windows.Controls.CheckBox chk) currentValue = chk.IsChecked.ToString();
+            else if (ctrl is System.Windows.Controls.Slider sld) currentValue = GetSliderValue(sld);
 
             // If the value changed, make it blue (DeepSkyBlue looks great on dark themes). Otherwise, reset it.
-            if (currentValue != originalValue)
-            {
-                ctrl.Foreground = Brushes.BlueViolet;          
-            }
+            Brush brush = currentValue != originalValue ? Brushes.BlueViolet : originalControlColors[ctrl];
+            if (ctrl is System.Windows.Controls.Slider slider)
+                ApplySliderBrush(slider, brush);
             else
-            {
-                ctrl.Foreground = originalControlColors[ctrl];
-            }
+                ctrl.Foreground = brush;
+        }
+
+        // Colors the slider and its value label (linked through the slider's Tag)
+        private void ApplySliderBrush(System.Windows.Controls.Slider sld, Brush brush)
+        {
+            sld.Foreground = brush;
+            if (sld.Tag is System.Windows.Controls.TextBlock valueLabel)
+                valueLabel.Foreground = brush;
         }
 
         private void ValidateAllControls()
