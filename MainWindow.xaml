@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DDTM_DSFixUI"
         mc:Ignorable="d"
-        Title="DDTM DSFix 3.0 UI SETTINGS" Height="760" Width="850" WindowStartupLocation="CenterScreen" Icon="icofdsfix3.ico">
+        Title="DDTM DSFix 3.0 UI SETTINGS" Height="860" Width="1000" WindowStartupLocation="CenterScreen" Icon="icofdsfix3.ico">
 
     <Window.Resources>
         <!-- Dark Souls Theme Styles -->
@@ -98,7 +98,7 @@
         </Grid>
 
         <!-- Main Settings Tabs -->
-        <TabControl Grid.Row="2" Margin="10,10,10,0" Background="#252525" BorderBrush="#FF8C00">
+        <TabControl x:Name="tabMain" SelectionChanged="TabMain_SelectionChanged" Grid.Row="2" Margin="10,10,10,0" Background="#252525" BorderBrush="#FF8C00">
 
             <!-- 1. GRAPHICS (Most Important) -->
             <TabItem Header="Graphics">
@@ -237,15 +237,15 @@
                             <Slider Grid.Row="1" Grid.Column="1" Name="sldHudScaleBottomLeft" Minimum="0.5" Maximum="1" Value="1" TickFrequency="0.05" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Foreground="White" VerticalAlignment="Center" Margin="5,4" Tag="{Binding ElementName=valHudScaleBottomLeft}" ToolTip="Scales the equipped items, weapons, shields, and magic slots."/>
                             <TextBlock Grid.Row="1" Grid.Column="2" Name="valHudScaleBottomLeft" Text="{Binding Value, ElementName=sldHudScaleBottomLeft, StringFormat=F2, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,5,0"/>
 
-                            <Label Grid.Row="2" Grid.Column="0" Content="Current Souls:" VerticalAlignment="Center"/>
+                            <Label Grid.Row="2" Grid.Column="0" Content="Current souls:" VerticalAlignment="Center"/>
                             <Slider Grid.Row="2" Grid.Column="1" Name="sldHudScaleBottomRight" Minimum="0.5" Maximum="1" Value="1" TickFrequency="0.05" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Foreground="White" VerticalAlignment="Center" Margin="5,4" Tag="{Binding ElementName=valHudScaleBottomRight}" ToolTip="Scales the current souls count."/>
                             <TextBlock Grid.Row="2" Grid.Column="2" Name="valHudScaleBottomRight" Text="{Binding Value, ElementName=sldHudScaleBottomRight, StringFormat=F2, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,5,0"/>
 
-                            <Label Grid.Row="3" Grid.Column="0" Content="Boss Health bar:" VerticalAlignment="Center"/>
+                            <Label Grid.Row="3" Grid.Column="0" Content="Bottom center:" VerticalAlignment="Center"/>
                             <Slider Grid.Row="3" Grid.Column="1" Name="sldHudScaleBottomCenter" Minimum="0.5" Maximum="1" Value="1" TickFrequency="0.05" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Foreground="White" VerticalAlignment="Center" Margin="5,4" Tag="{Binding ElementName=valHudScaleBottomCenter}" ToolTip="Scales the bottom center HUD elements."/>
                             <TextBlock Grid.Row="3" Grid.Column="2" Name="valHudScaleBottomCenter" Text="{Binding Value, ElementName=sldHudScaleBottomCenter, StringFormat=F2, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,5,0"/>
                         </Grid>
-                        <Separator x:Name="sep2" Height="44" Background="#FF736554"/>
+                        <Separator x:Name="sep2" Height="26" Background="#FF736554"/>
 
                         <!-- HUD Opacity -->
                         <TextBlock x:Name="txtblockhud2" Text="HUD Opacity (0.0 = fully transparent | 1.0 = fully opaque)" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,15,0,5"/>
@@ -257,6 +257,34 @@
                             <Label Content="Current souls: "/>
                             <TextBox Name="txtHudBottomRightOpacity" Width="50" Text="1.0" ToolTip="Opacity for the soul count."/>
                         </WrapPanel>
+                        <Separator x:Name="sep3" Height="26" Background="#FF736554"/>
+
+                        <!-- Menu and other windows -->
+                        <TextBlock x:Name="txtblockhud3" Text="Menu and other windows (1.0 = Default | 0.75 = 75% | 0.5 = 50%)" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,15,0,5"/>
+                        <Grid x:Name="wrappanelhud3" HorizontalAlignment="Left" Width="560" Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="55"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+
+                            <Label Grid.Row="0" Grid.Column="0" Content="Menu/Inventory:" VerticalAlignment="Center"/>
+                            <Slider Grid.Row="0" Grid.Column="1" Name="sldMenuScale" Minimum="0.5" Maximum="1" Value="1" TickFrequency="0.05" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Foreground="White" VerticalAlignment="Center" Margin="5,4" Tag="{Binding ElementName=valMenuScale}" ToolTip="Top right quick menu and the inventory/status windows."/>
+                            <TextBlock Grid.Row="0" Grid.Column="2" Name="valMenuScale" Text="{Binding Value, ElementName=sldMenuScale, StringFormat=F2, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,5,0"/>
+
+                            <Label Grid.Row="1" Grid.Column="0" Content="Bonfire/NPC list:" VerticalAlignment="Center"/>
+                            <Slider Grid.Row="1" Grid.Column="1" Name="sldListWindowScale" Minimum="0.5" Maximum="1" Value="1" TickFrequency="0.05" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Foreground="White" VerticalAlignment="Center" Margin="5,4" Tag="{Binding ElementName=valListWindowScale}" ToolTip="Bonfire menu and the other list windows on the left side of the screen."/>
+                            <TextBlock Grid.Row="1" Grid.Column="2" Name="valListWindowScale" Text="{Binding Value, ElementName=sldListWindowScale, StringFormat=F2, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,5,0"/>
+
+                            <Label Grid.Row="2" Grid.Column="0" Content="Interaction prompts:" VerticalAlignment="Center"/>
+                            <Slider Grid.Row="2" Grid.Column="1" Name="sldPromptScale" Minimum="0.5" Maximum="1" Value="1" TickFrequency="0.05" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Foreground="White" VerticalAlignment="Center" Margin="5,4" Tag="{Binding ElementName=valPromptScale}" ToolTip="Interaction prompts, Yes/No questions."/>
+                            <TextBlock Grid.Row="2" Grid.Column="2" Name="valPromptScale" Text="{Binding Value, ElementName=sldPromptScale, StringFormat=F2, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,5,0"/>
+
+                            <Label Grid.Row="3" Grid.Column="0" Content="Subtitles:" VerticalAlignment="Center"/>
+                            <Slider Grid.Row="3" Grid.Column="1" Name="sldSubtitleScale" Minimum="0.5" Maximum="1" Value="1" TickFrequency="0.05" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Foreground="White" VerticalAlignment="Center" Margin="5,4" Tag="{Binding ElementName=valSubtitleScale}" ToolTip="NPC dialogue subtitles."/>
+                            <TextBlock Grid.Row="3" Grid.Column="2" Name="valSubtitleScale" Text="{Binding Value, ElementName=sldSubtitleScale, StringFormat=F2, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,5,0"/>
+                        </Grid>
 
                     </StackPanel>
                 </ScrollViewer>
@@ -419,6 +447,651 @@
 
                     </StackPanel>
                 </ScrollViewer>
+            </TabItem>
+            <!-- 8. DDTM CONTROLLER -->
+            <TabItem Header="DDTM Controller" x:Name="tabController">
+                <Grid>
+                    <Grid x:Name="gridController" Visibility="Collapsed">
+                        <Grid.Resources>
+                            <Style x:Key="MapCard" TargetType="Border">
+                                <Setter Property="Margin" Value="5"/>
+                                <Setter Property="Padding" Value="7"/>
+                                <Setter Property="Background" Value="#2D2D2D"/>
+                                <Setter Property="BorderThickness" Value="2"/>
+                                <Setter Property="CornerRadius" Value="8"/>
+                                <Setter Property="Width" Value="128"/>
+                            </Style>
+                            <Style x:Key="MapTitle" TargetType="TextBlock">
+                                <Setter Property="FontSize" Value="18"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                            </Style>
+                            <Style x:Key="MapSub" TargetType="TextBlock">
+                                <Setter Property="FontSize" Value="10"/>
+                                <Setter Property="Foreground" Value="#A8A8A8"/>
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                                <Setter Property="TextAlignment" Value="Center"/>
+                                <Setter Property="TextWrapping" Value="Wrap"/>
+                                <Setter Property="Margin" Value="0,0,0,4"/>
+                            </Style>
+                            <Style x:Key="MapCombo" TargetType="ComboBox">
+                                <Setter Property="Width" Value="100"/>
+                                <Setter Property="Height" Value="24"/>
+                                <Setter Property="FontSize" Value="12"/>
+                            </Style>
+                            <Style x:Key="PresetCard" TargetType="RadioButton">
+                                <Setter Property="Foreground" Value="#E0E0E0"/>
+                                <Setter Property="Margin" Value="0,0,0,10"/>
+                                <Setter Property="Cursor" Value="Hand"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="RadioButton">
+                                            <Border x:Name="card" Background="#2D2D2D" BorderBrush="#5A4A3A" BorderThickness="2" CornerRadius="6" Padding="12,8">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="28"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Ellipse x:Name="dot" Width="16" Height="16" Stroke="#FF8C00" StrokeThickness="2" Fill="Transparent" VerticalAlignment="Top" Margin="0,3,0,0"/>
+                                                    <ContentPresenter Grid.Column="1"/>
+                                                </Grid>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="card" Property="BorderBrush" Value="#FFB347"/>
+                                                </Trigger>
+                                                <Trigger Property="IsChecked" Value="True">
+                                                    <Setter TargetName="card" Property="BorderBrush" Value="#FF8C00"/>
+                                                    <Setter TargetName="card" Property="Background" Value="#3A2A18"/>
+                                                    <Setter TargetName="dot" Property="Fill" Value="#FF8C00"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Grid.Resources>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TabControl x:Name="tabControllerInner" Grid.Row="0" Margin="5" Background="#252525" BorderBrush="#FF8C00">
+                            <TabItem Header="BUTTON MAPPING">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                    <StackPanel Margin="8">
+                                        <TextBlock Text="Each card is a game input. Choose the real controller button for it from the list." Foreground="#D3D3D3" TextWrapping="Wrap" Margin="4,0,4,6"/>
+                                        <Viewbox Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Center">
+                                            <Grid Width="940">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="200"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
+                                                    <Border Style="{StaticResource MapCard}" Width="128" BorderBrush="#9AA5B1" ToolTip="Game input 'LT'.&#x0a;Pick the real controller button that should trigger it.&#x0a;NONE disables this input.">
+                                                        <StackPanel>
+                                                            <TextBlock Text="LT" Style="{StaticResource MapTitle}" Foreground="#9AA5B1"/>
+                                                            <TextBlock Text="Left trigger" Style="{StaticResource MapSub}"/>
+                                                            <ComboBox x:Name="cmbMap_LT" Style="{StaticResource MapCombo}"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                    <Border Style="{StaticResource MapCard}" Width="128" BorderBrush="#9AA5B1" ToolTip="Game input 'LB'.&#x0a;Pick the real controller button that should trigger it.&#x0a;NONE disables this input.">
+                                                        <StackPanel>
+                                                            <TextBlock Text="LB" Style="{StaticResource MapTitle}" Foreground="#9AA5B1"/>
+                                                            <TextBlock Text="Left bumper" Style="{StaticResource MapSub}"/>
+                                                            <ComboBox x:Name="cmbMap_LB" Style="{StaticResource MapCombo}"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </StackPanel>
+                                                <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                                                    <Border Style="{StaticResource MapCard}" Width="128" BorderBrush="#9AA5B1" ToolTip="Game input 'RB'.&#x0a;Pick the real controller button that should trigger it.&#x0a;NONE disables this input.">
+                                                        <StackPanel>
+                                                            <TextBlock Text="RB" Style="{StaticResource MapTitle}" Foreground="#9AA5B1"/>
+                                                            <TextBlock Text="Right bumper" Style="{StaticResource MapSub}"/>
+                                                            <ComboBox x:Name="cmbMap_RB" Style="{StaticResource MapCombo}"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                    <Border Style="{StaticResource MapCard}" Width="128" BorderBrush="#9AA5B1" ToolTip="Game input 'RT'.&#x0a;Pick the real controller button that should trigger it.&#x0a;NONE disables this input.">
+                                                        <StackPanel>
+                                                            <TextBlock Text="RT" Style="{StaticResource MapTitle}" Foreground="#9AA5B1"/>
+                                                            <TextBlock Text="Right trigger" Style="{StaticResource MapSub}"/>
+                                                            <ComboBox x:Name="cmbMap_RT" Style="{StaticResource MapCombo}"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </StackPanel>
+                                                <Grid Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                    </Grid.RowDefinitions>
+                                                    <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource MapCard}" Width="112" BorderBrush="#D8D8D8" ToolTip="Game input 'DPAD_UP'.&#x0a;Pick the real controller button that should trigger it.&#x0a;NONE disables this input.">
+                                                        <StackPanel>
+                                                            <TextBlock Text="D-Pad &#9650;" Style="{StaticResource MapTitle}" Foreground="#D8D8D8"/>
+                                                            <TextBlock Text="Direction pad" Style="{StaticResource MapSub}"/>
+                                                            <ComboBox x:Name="cmbMap_DPAD_UP" Style="{StaticResource MapCombo}"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                    <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource MapCard}" Width="112" BorderBrush="#D8D8D8" ToolTip="Game input 'DPAD_LEFT'.&#x0a;Pick the real controller button that should trigger it.&#x0a;NONE disables this input.">
+                                                        <StackPanel>
+                                                            <TextBlock Text="D-Pad &#9664;" Style="{StaticResource MapTitle}" Foreground="#D8D8D8"/>
+                                                            <TextBlock Text="Direction pad" Style="{StaticResource MapSub}"/>
+                                                            <ComboBox x:Name="cmbMap_DPAD_LEFT" Style="{StaticResource MapCombo}"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                    <Border Grid.Row="1" Grid.Column="2" Style="{StaticResource MapCard}" Width="112" BorderBrush="#D8D8D8" ToolTip="Game input 'DPAD_RIGHT'.&#x0a;Pick the real controller button that should trigger it.&#x0a;NONE disables this input.">
+                                                        <StackPanel>
+                                                            <TextBlock Text="D-Pad &#9654;" Style="{StaticResource MapTitle}" Foreground="#D8D8D8"/>
+                                                            <TextBlock Text="Direction pad" Style="{StaticResource MapSub}"/>
+                                                            <ComboBox x:Name="cmbMap_DPAD_RIGHT" Style="{StaticResource MapCombo}"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                    <Border Grid.Row="2" Grid.Column="1" Style="{StaticResource MapCard}" Width="112" BorderBrush="#D8D8D8" ToolTip="Game input 'DPAD_DOWN'.&#x0a;Pick the real controller button that should trigger it.&#x0a;NONE disables this input.">
+                                                        <StackPanel>
+                                                            <TextBlock Text="D-Pad &#9660;" Style="{StaticResource MapTitle}" Foreground="#D8D8D8"/>
+                                                            <TextBlock Text="Direction pad" Style="{StaticResource MapSub}"/>
+                                                            <ComboBox x:Name="cmbMap_DPAD_DOWN" Style="{StaticResource MapCombo}"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </Grid>
+                                                <StackPanel Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                    <Border Style="{StaticResource MapCard}" Width="176" BorderBrush="#C9B037" ToolTip="Game input 'BACK'.&#x0a;You can map TWO different buttons to it (e.g. TOUCHPAD and SHARE).&#x0a;Set the 2nd to NONE to use just one.">
+                                                        <StackPanel>
+                                                            <TextBlock Text="BACK" Style="{StaticResource MapTitle}" Foreground="#C9B037"/>
+                                                            <TextBlock Text="Back / Select - up to 2 buttons" Style="{StaticResource MapSub}"/>
+                                                            <TextBlock Text="1st button" Style="{StaticResource MapSub}"/>
+                                                            <ComboBox x:Name="cmbMap_BACK" Style="{StaticResource MapCombo}" Width="150"/>
+                                                            <TextBlock Text="2nd button (optional)" Style="{StaticResource MapSub}" Margin="0,4,0,0"/>
+                                                            <ComboBox x:Name="cmbMap_BACK2" Style="{StaticResource MapCombo}" Width="150"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                    <Border Style="{StaticResource MapCard}" Width="176" BorderBrush="#C9B037" ToolTip="Game input 'START'.&#x0a;Pick the real controller button that should trigger it.&#x0a;NONE disables this input.">
+                                                        <StackPanel>
+                                                            <TextBlock Text="START" Style="{StaticResource MapTitle}" Foreground="#C9B037"/>
+                                                            <TextBlock Text="Start / menu" Style="{StaticResource MapSub}"/>
+                                                            <ComboBox x:Name="cmbMap_START" Style="{StaticResource MapCombo}"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </StackPanel>
+                                                <Grid Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                    </Grid.RowDefinitions>
+                                                    <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource MapCard}" Width="112" BorderBrush="#E6C229" ToolTip="Game input 'Y'.&#x0a;Pick the real controller button that should trigger it.&#x0a;NONE disables this input.">
+                                                        <StackPanel>
+                                                            <TextBlock Text="Y" Style="{StaticResource MapTitle}" Foreground="#E6C229"/>
+                                                            <TextBlock Text="Xbox Y button" Style="{StaticResource MapSub}"/>
+                                                            <ComboBox x:Name="cmbMap_Y" Style="{StaticResource MapCombo}"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                    <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource MapCard}" Width="112" BorderBrush="#4A90D9" ToolTip="Game input 'X'.&#x0a;Pick the real controller button that should trigger it.&#x0a;NONE disables this input.">
+                                                        <StackPanel>
+                                                            <TextBlock Text="X" Style="{StaticResource MapTitle}" Foreground="#4A90D9"/>
+                                                            <TextBlock Text="Xbox X button" Style="{StaticResource MapSub}"/>
+                                                            <ComboBox x:Name="cmbMap_X" Style="{StaticResource MapCombo}"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                    <Border Grid.Row="1" Grid.Column="2" Style="{StaticResource MapCard}" Width="112" BorderBrush="#E0524D" ToolTip="Game input 'B'.&#x0a;Pick the real controller button that should trigger it.&#x0a;NONE disables this input.&#x0a;Default game use: roll / sprint / backstep / cancel.&#x0a;For the Japanese layout set A = CIRCLE and B = CROSS (both!).">
+                                                        <StackPanel>
+                                                            <TextBlock Text="B" Style="{StaticResource MapTitle}" Foreground="#E0524D"/>
+                                                            <TextBlock Text="Roll / sprint / cancel" Style="{StaticResource MapSub}"/>
+                                                            <ComboBox x:Name="cmbMap_B" Style="{StaticResource MapCombo}"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                    <Border Grid.Row="2" Grid.Column="1" Style="{StaticResource MapCard}" Width="112" BorderBrush="#3CB371" ToolTip="Game input 'A'.&#x0a;Pick the real controller button that should trigger it.&#x0a;NONE disables this input.&#x0a;Default game use: confirm / interact.&#x0a;For the Japanese layout set A = CIRCLE and B = CROSS (both!).">
+                                                        <StackPanel>
+                                                            <TextBlock Text="A" Style="{StaticResource MapTitle}" Foreground="#3CB371"/>
+                                                            <TextBlock Text="Confirm / interact" Style="{StaticResource MapSub}"/>
+                                                            <ComboBox x:Name="cmbMap_A" Style="{StaticResource MapCombo}"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </Grid>
+                                                <Border HorizontalAlignment="Center" Grid.Row="2" Grid.Column="0" Style="{StaticResource MapCard}" Width="128" BorderBrush="#7FA6D6" ToolTip="Game input 'LS'.&#x0a;Pick the real controller button that should trigger it.&#x0a;NONE disables this input.">
+                                                    <StackPanel>
+                                                        <TextBlock Text="LS" Style="{StaticResource MapTitle}" Foreground="#7FA6D6"/>
+                                                        <TextBlock Text="Left stick click" Style="{StaticResource MapSub}"/>
+                                                        <ComboBox x:Name="cmbMap_LS" Style="{StaticResource MapCombo}"/>
+                                                    </StackPanel>
+                                                </Border>
+                                                <Border HorizontalAlignment="Center" Grid.Row="2" Grid.Column="2" Style="{StaticResource MapCard}" Width="128" BorderBrush="#7FA6D6" ToolTip="Game input 'RS'.&#x0a;Pick the real controller button that should trigger it.&#x0a;NONE disables this input.">
+                                                    <StackPanel>
+                                                        <TextBlock Text="RS" Style="{StaticResource MapTitle}" Foreground="#7FA6D6"/>
+                                                        <TextBlock Text="Right stick click" Style="{StaticResource MapSub}"/>
+                                                        <ComboBox x:Name="cmbMap_RS" Style="{StaticResource MapCombo}"/>
+                                                    </StackPanel>
+                                                </Border>
+                                            </Grid>
+                                        </Viewbox>
+                                        <Border Background="#2A2A2A" BorderBrush="#5A4A3A" BorderThickness="1" CornerRadius="6" Padding="10" Margin="4,12,4,4">
+                                            <StackPanel>
+                                                <TextBlock Text="Japanese PS3 layout" Foreground="#FF8C00" FontWeight="Bold" FontSize="14"/>
+                                                <TextBlock TextWrapping="Wrap" Foreground="#D3D3D3" Margin="0,3,0,6" Text="Confirm/Interact on CIRCLE and Roll/Sprint/Cancel on CROSS, as in the Japanese PS3 release. You must change BOTH A and B (A = CIRCLE, B = CROSS); changing only one puts two functions on one button and leaves the other dead. Leave the game's own controller options at their defaults, or the two swaps cancel each other out."/>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Button Content="Use Japanese layout (A = CIRCLE, B = CROSS)" Click="BtnJapaneseLayout_Click" Margin="0,0,8,0"/>
+                                                    <Button Content="Use standard layout (A = CROSS, B = CIRCLE)" Click="BtnStandardLayout_Click"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+                            <TabItem Header="PRESETS">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                    <StackPanel Margin="10">
+                                        <TextBlock Text="1. PRESET - START HERE" Foreground="#FF8C00" FontSize="18" FontWeight="Bold"/>
+                                        <TextBlock TextWrapping="Wrap" Foreground="#E0E0E0" Margin="0,6,0,0" Text="A preset sets up the macros AND the behaviour switches that go with them, in one go. Presets never change your button mapping, so your controller layout (including the Japanese layout) is always kept."/>
+                                        <TextBlock TextWrapping="Wrap" Foreground="#E0E0E0" Margin="0,6,0,0" Text="A preset overrides the macro lines (Macros tab) and the behaviour settings (Advanced Settings tab). To build your own setup instead, leave this on NONE."/>
+                                        <TextBlock TextWrapping="Wrap" Foreground="#9ACD32" FontWeight="SemiBold" Margin="0,6,0,12" Text="Quick start: pick ONE preset below and you are done. Everything else is optional fine tuning."/>
+                                        <RadioButton x:Name="rbPreset_NONE" GroupName="DdtmPreset" Tag="NONE" Style="{StaticResource PresetCard}" ToolTip="Preset = NONE&#x0a;Only one preset can be active.">
+                                            <StackPanel>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="NONE" Foreground="#FF8C00" FontSize="16" FontWeight="Bold"/>
+                                                    <TextBlock Text="   Vanilla controls, no macros" Foreground="#FFFFFF" FontSize="14" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                                <TextBlock Text="Vanilla controls, no macros. You still get the controller support, deadzones, sensitivity and rumble fixes. Choose this to build your own setup with the Macros and Advanced Settings tabs." Foreground="#C8C8C8" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                                            </StackPanel>
+                                        </RadioButton>
+                                        <RadioButton x:Name="rbPreset_DS3_JUMP" GroupName="DdtmPreset" Tag="DS3_JUMP" Style="{StaticResource PresetCard}" ToolTip="Preset = DS3_JUMP&#x0a;Only one preset can be active.">
+                                            <StackPanel>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="DS3_JUMP" Foreground="#FF8C00" FontSize="16" FontWeight="Bold"/>
+                                                    <TextBlock Text="   Jump on its own button, like Dark Souls 3" Foreground="#FFFFFF" FontSize="14" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                                <TextBlock Text="L3 = jump" Foreground="#9ACD32" FontFamily="Consolas" FontSize="13" Margin="14,2,0,0"/>
+                                                <TextBlock Text="Your roll button can no longer jump by accident, so the only jumps you get are the ones you pressed L3 for. Rolling, sprinting, backstepping and Cancel all behave exactly as normal. The simplest preset, and the one that changes the least." Foreground="#C8C8C8" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                                            </StackPanel>
+                                        </RadioButton>
+                                        <RadioButton x:Name="rbPreset_MORTAL_SHELL" GroupName="DdtmPreset" Tag="MORTAL_SHELL" Style="{StaticResource PresetCard}" ToolTip="Preset = MORTAL_SHELL&#x0a;Only one preset can be active.">
+                                            <StackPanel>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="MORTAL_SHELL" Foreground="#FF8C00" FontSize="16" FontWeight="Bold"/>
+                                                    <TextBlock Text="   Sprint moved onto CROSS" Foreground="#FFFFFF" FontSize="14" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                                <TextBlock Text="CROSS = hold to sprint" Foreground="#9ACD32" FontFamily="Consolas" FontSize="13" Margin="14,2,0,0"/>
+                                                <TextBlock Text="L3 = toggle auto-run" Foreground="#9ACD32" FontFamily="Consolas" FontSize="13" Margin="14,2,0,0"/>
+                                                <TextBlock Text="CROSS + R1 = kick" Foreground="#9ACD32" FontFamily="Consolas" FontSize="13" Margin="14,2,0,0"/>
+                                                <TextBlock Text="CROSS + R2 = leaping attack" Foreground="#9ACD32" FontFamily="Consolas" FontSize="13" Margin="14,2,0,0"/>
+                                                <TextBlock Text="Adds a second sprint button on CROSS, so you can run without touching the roll button. CIRCLE is left exactly as the game made it and still rolls, sprints and jumps as normal. CROSS keeps its normal job too, so menus work." Foreground="#C8C8C8" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                                            </StackPanel>
+                                        </RadioButton>
+                                        <RadioButton x:Name="rbPreset_ELDEN_RING" GroupName="DdtmPreset" Tag="ELDEN_RING" Style="{StaticResource PresetCard}" ToolTip="Preset = ELDEN_RING&#x0a;Only one preset can be active.">
+                                            <StackPanel>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="ELDEN_RING" Foreground="#FF8C00" FontSize="16" FontWeight="Bold"/>
+                                                    <TextBlock Text="   Jump on CROSS, like Elden Ring" Foreground="#FFFFFF" FontSize="14" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                                <TextBlock Text="CROSS = jump" Foreground="#9ACD32" FontFamily="Consolas" FontSize="13" Margin="14,2,0,0"/>
+                                                <TextBlock Text="L3 = toggle auto-run" Foreground="#9ACD32" FontFamily="Consolas" FontSize="13" Margin="14,2,0,0"/>
+                                                <TextBlock Text="CROSS + R1 = kick" Foreground="#9ACD32" FontFamily="Consolas" FontSize="13" Margin="14,2,0,0"/>
+                                                <TextBlock Text="CROSS + R2 = leaping attack" Foreground="#9ACD32" FontFamily="Consolas" FontSize="13" Margin="14,2,0,0"/>
+                                                <TextBlock Text="Your roll button can no longer jump by accident. CROSS keeps its normal job, so menus still work: standing still it just interacts, and it only jumps while you are holding the stick in a direction. Warning: CROSS is also Interact, so a jump next to a lever or item can set that thing off." Foreground="#C8C8C8" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                                            </StackPanel>
+                                        </RadioButton>
+                                        <RadioButton x:Name="rbPreset_RUN_AND_ATTACK" GroupName="DdtmPreset" Tag="RUN_AND_ATTACK" Style="{StaticResource PresetCard}" ToolTip="Preset = RUN_AND_ATTACK&#x0a;Only one preset can be active.">
+                                            <StackPanel>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="RUN_AND_ATTACK" Foreground="#FF8C00" FontSize="16" FontWeight="Bold"/>
+                                                    <TextBlock Text="   Vanilla movement, better attacks" Foreground="#FFFFFF" FontSize="14" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                                <TextBlock Text="L3 = toggle auto-run" Foreground="#9ACD32" FontFamily="Consolas" FontSize="13" Margin="14,2,0,0"/>
+                                                <TextBlock Text="CIRCLE + R1 = kick" Foreground="#9ACD32" FontFamily="Consolas" FontSize="13" Margin="14,2,0,0"/>
+                                                <TextBlock Text="CIRCLE + R2 = leaping attack" Foreground="#9ACD32" FontFamily="Consolas" FontSize="13" Margin="14,2,0,0"/>
+                                                <TextBlock Text="Rolling, sprinting and jumping are left exactly as the game made them. Adds only the auto-run for long runbacks and reliable kicks and leaping attacks, with no stick flick needed. The safest choice if you do not want your movement touched at all." Foreground="#C8C8C8" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                                            </StackPanel>
+                                        </RadioButton>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+                            <TabItem Header="MACROS">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                    <StackPanel Margin="10">
+                                        <Border x:Name="txtMacroBanner" Visibility="Collapsed" Background="#4A1F1F" BorderBrush="#FF5F5F" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,0,8">
+                                            <TextBlock Foreground="#FFB0B0" TextWrapping="Wrap" Text="A preset is selected (see the PRESETS tab), so it overrides everything on this tab. Choose NONE on the PRESETS tab to edit macros yourself."/>
+                                        </Border>
+                                        <StackPanel x:Name="panelMacros">
+                                            <TextBlock Text="MACROS (only used when Preset = NONE)" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,14,0,2"/>
+                                            <TextBlock Text="Assign one button, or a combination of up to 3 buttons that must be pressed together (e.g. R1 + L3). Leave all three on NONE to disable a macro." Foreground="#A8A8A8" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,6"/>
+                                            <Border Background="#2D2D2D" BorderBrush="#5A4A3A" BorderThickness="1" CornerRadius="5" Padding="8" Margin="0,3" ToolTip="Kick (KICK)&#x0a;Instant kick.&#x0a;Button 1 alone = single button. Add Button 2 / 3 for a combination.">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Margin="0,0,12,0">
+                                                        <TextBlock Text="Kick" Foreground="#FFFFFF" FontWeight="Bold" FontSize="14"/>
+                                                        <TextBlock Text="Instant kick." Foreground="#B8B8B8" FontSize="12" TextWrapping="Wrap"/>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <ComboBox x:Name="cmbMacro_KICK_1" Width="112" Height="26"/>
+                                                        <TextBlock Text="+" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" VerticalAlignment="Center" Margin="6,0"/>
+                                                        <ComboBox x:Name="cmbMacro_KICK_2" Width="112" Height="26"/>
+                                                        <TextBlock Text="+" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" VerticalAlignment="Center" Margin="6,0"/>
+                                                        <ComboBox x:Name="cmbMacro_KICK_3" Width="112" Height="26"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </Border>
+                                            <Border Background="#2D2D2D" BorderBrush="#5A4A3A" BorderThickness="1" CornerRadius="5" Padding="8" Margin="0,3" ToolTip="Leap attack (LEAP_ATTACK)&#x0a;Instant jumping heavy attack.&#x0a;Button 1 alone = single button. Add Button 2 / 3 for a combination.">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Margin="0,0,12,0">
+                                                        <TextBlock Text="Leap attack" Foreground="#FFFFFF" FontWeight="Bold" FontSize="14"/>
+                                                        <TextBlock Text="Instant jumping heavy attack." Foreground="#B8B8B8" FontSize="12" TextWrapping="Wrap"/>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <ComboBox x:Name="cmbMacro_LEAP_ATTACK_1" Width="112" Height="26"/>
+                                                        <TextBlock Text="+" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" VerticalAlignment="Center" Margin="6,0"/>
+                                                        <ComboBox x:Name="cmbMacro_LEAP_ATTACK_2" Width="112" Height="26"/>
+                                                        <TextBlock Text="+" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" VerticalAlignment="Center" Margin="6,0"/>
+                                                        <ComboBox x:Name="cmbMacro_LEAP_ATTACK_3" Width="112" Height="26"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </Border>
+                                            <Border Background="#2D2D2D" BorderBrush="#5A4A3A" BorderThickness="1" CornerRadius="5" Padding="8" Margin="0,3" ToolTip="Auto-run (AUTO_RUN)&#x0a;Toggle auto-sprint. Push the stick and you run on your own. Switches off when you stop, attack or open a menu.&#x0a;Button 1 alone = single button. Add Button 2 / 3 for a combination.">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Margin="0,0,12,0">
+                                                        <TextBlock Text="Auto-run" Foreground="#FFFFFF" FontWeight="Bold" FontSize="14"/>
+                                                        <TextBlock Text="Toggle auto-sprint. Push the stick and you run on your own. Switches off when you stop, attack or open a menu." Foreground="#B8B8B8" FontSize="12" TextWrapping="Wrap"/>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <ComboBox x:Name="cmbMacro_AUTO_RUN_1" Width="112" Height="26"/>
+                                                        <TextBlock Text="+" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" VerticalAlignment="Center" Margin="6,0"/>
+                                                        <ComboBox x:Name="cmbMacro_AUTO_RUN_2" Width="112" Height="26"/>
+                                                        <TextBlock Text="+" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" VerticalAlignment="Center" Margin="6,0"/>
+                                                        <ComboBox x:Name="cmbMacro_AUTO_RUN_3" Width="112" Height="26"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </Border>
+                                            <Border Background="#2D2D2D" BorderBrush="#5A4A3A" BorderThickness="1" CornerRadius="5" Padding="8" Margin="0,3" ToolTip="Dash / sprint only (DASH_SPRINT_ONLY)&#x0a;Hold to sprint. Taps can never roll, and pressing it again right after cannot jump.&#x0a;Button 1 alone = single button. Add Button 2 / 3 for a combination.">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Margin="0,0,12,0">
+                                                        <TextBlock Text="Dash / sprint only" Foreground="#FFFFFF" FontWeight="Bold" FontSize="14"/>
+                                                        <TextBlock Text="Hold to sprint. Taps can never roll, and pressing it again right after cannot jump." Foreground="#B8B8B8" FontSize="12" TextWrapping="Wrap"/>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <ComboBox x:Name="cmbMacro_DASH_SPRINT_ONLY_1" Width="112" Height="26"/>
+                                                        <TextBlock Text="+" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" VerticalAlignment="Center" Margin="6,0"/>
+                                                        <ComboBox x:Name="cmbMacro_DASH_SPRINT_ONLY_2" Width="112" Height="26"/>
+                                                        <TextBlock Text="+" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" VerticalAlignment="Center" Margin="6,0"/>
+                                                        <ComboBox x:Name="cmbMacro_DASH_SPRINT_ONLY_3" Width="112" Height="26"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </Border>
+                                            <Border Background="#2D2D2D" BorderBrush="#5A4A3A" BorderThickness="1" CornerRadius="5" Padding="8" Margin="0,3" ToolTip="Roll only (ROLL_ONLY)&#x0a;Always rolls, never sprints, however long you hold it. Standing still it backsteps, as the game normally does.&#x0a;Button 1 alone = single button. Add Button 2 / 3 for a combination.">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Margin="0,0,12,0">
+                                                        <TextBlock Text="Roll only" Foreground="#FFFFFF" FontWeight="Bold" FontSize="14"/>
+                                                        <TextBlock Text="Always rolls, never sprints, however long you hold it. Standing still it backsteps, as the game normally does." Foreground="#B8B8B8" FontSize="12" TextWrapping="Wrap"/>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <ComboBox x:Name="cmbMacro_ROLL_ONLY_1" Width="112" Height="26"/>
+                                                        <TextBlock Text="+" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" VerticalAlignment="Center" Margin="6,0"/>
+                                                        <ComboBox x:Name="cmbMacro_ROLL_ONLY_2" Width="112" Height="26"/>
+                                                        <TextBlock Text="+" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" VerticalAlignment="Center" Margin="6,0"/>
+                                                        <ComboBox x:Name="cmbMacro_ROLL_ONLY_3" Width="112" Height="26"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </Border>
+                                            <Border Background="#2D2D2D" BorderBrush="#5A4A3A" BorderThickness="1" CornerRadius="5" Padding="8" Margin="0,3" ToolTip="Jump only (JUMP_ONLY)&#x0a;Jump. You must be holding the stick in a direction; it does nothing standing still, because the game has no standing jump. Instant while already sprinting, with a short wind-up from a walk.&#x0a;Button 1 alone = single button. Add Button 2 / 3 for a combination.">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Margin="0,0,12,0">
+                                                        <TextBlock Text="Jump only" Foreground="#FFFFFF" FontWeight="Bold" FontSize="14"/>
+                                                        <TextBlock Text="Jump. You must be holding the stick in a direction; it does nothing standing still, because the game has no standing jump. Instant while already sprinting, with a short wind-up from a walk." Foreground="#B8B8B8" FontSize="12" TextWrapping="Wrap"/>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <ComboBox x:Name="cmbMacro_JUMP_ONLY_1" Width="112" Height="26"/>
+                                                        <TextBlock Text="+" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" VerticalAlignment="Center" Margin="6,0"/>
+                                                        <ComboBox x:Name="cmbMacro_JUMP_ONLY_2" Width="112" Height="26"/>
+                                                        <TextBlock Text="+" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" VerticalAlignment="Center" Margin="6,0"/>
+                                                        <ComboBox x:Name="cmbMacro_JUMP_ONLY_3" Width="112" Height="26"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </Border>
+                                            <Separator Height="6" Background="#FF736554" Margin="0,8,0,0"/>
+                                            <TextBlock Text="MACRO BEHAVIOUR" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,14,0,2"/>
+                                            <CheckBox x:Name="chk_AutoRun_CancelOnStop" Content="Auto-run: cancel when the stick is released" Foreground="White" Margin="0,4,0,0" ToolTip="AutoRun_CancelOnStop&#x0a;ON: auto-sprint switches off once you let the stick go, so moving again walks. Press the button again to turn it back on.&#x0a;OFF: it stays on until you press the button, attack, or open a menu."/>
+                                            <TextBlock Text="ON: auto-sprint switches off once you let the stick go, so moving again walks. OFF: it stays on until you press the button, attack, or open a menu." Foreground="#A8A8A8" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,6"/>
+                                            <CheckBox x:Name="chk_SuppressMacroButtons" Content="Suppress the normal input of single-button macro buttons" Foreground="White" Margin="0,4,0,0" ToolTip="SuppressMacroButtons&#x0a;ON: a button used by a single-button macro stops sending its normal input, so you do not get both at once. Combinations are unaffected.&#x0a;OFF: the button sends the macro AND its normal input."/>
+                                            <TextBlock Text="ON: a button used by a single-button macro stops sending its normal input, so you do not get both at once (combinations are unaffected). OFF: the button sends the macro AND its normal input." Foreground="#A8A8A8" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,6"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+                            <TabItem Header="ADVANCED SETTINGS">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                    <StackPanel Margin="10">
+                                        <TextBlock Text="3. STICKS, TRIGGERS AND RUMBLE" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,14,0,2"/>
+                                        <TextBlock Text="Some of these can be overridden by the preset chosen on the PRESETS tab." Foreground="#A8A8A8" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,6"/>
+                                        <TextBlock Text="Stick deadzones (0 - 32767)" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,14,0,2"/>
+                                        <TextBlock Text="Calculated as a circle, not per axis. Min = the resting area (raise it if your character drifts on its own). Max = how far you must push to get 100% (lower it if diagonals will not run)." Foreground="#A8A8A8" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,6"/>
+                                        <Grid Margin="0,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="210"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="70"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Label Content="Left stick - Min" VerticalAlignment="Center" ToolTip="Resting area of the left stick (movement).&#x0a;Raise it if your character drifts on its own."/>
+                                            <Slider Grid.Column="1" x:Name="sld_LS_DeadzoneMin" Minimum="0" Maximum="32767" Value="7000" SmallChange="100" LargeChange="1000" TickFrequency="1000" TickPlacement="BottomRight" Foreground="White" VerticalAlignment="Center" Margin="5,0" Tag="{Binding ElementName=val_LS_DeadzoneMin}" ToolTip="Resting area of the left stick (movement).&#x0a;Raise it if your character drifts on its own."/>
+                                            <TextBlock Grid.Column="2" x:Name="val_LS_DeadzoneMin" Text="{Binding Value, ElementName=sld_LS_DeadzoneMin, StringFormat=F0, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,6,0"/>
+                                        </Grid>
+                                        <Grid Margin="0,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="210"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="70"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Label Content="Left stick - Max" VerticalAlignment="Center" ToolTip="How far you must push the left stick to get 100%.&#x0a;Lower it if diagonals will not run."/>
+                                            <Slider Grid.Column="1" x:Name="sld_LS_DeadzoneMax" Minimum="0" Maximum="32767" Value="22000" SmallChange="100" LargeChange="1000" TickFrequency="1000" TickPlacement="BottomRight" Foreground="White" VerticalAlignment="Center" Margin="5,0" Tag="{Binding ElementName=val_LS_DeadzoneMax}" ToolTip="How far you must push the left stick to get 100%.&#x0a;Lower it if diagonals will not run."/>
+                                            <TextBlock Grid.Column="2" x:Name="val_LS_DeadzoneMax" Text="{Binding Value, ElementName=sld_LS_DeadzoneMax, StringFormat=F0, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,6,0"/>
+                                        </Grid>
+                                        <Grid Margin="0,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="210"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="70"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Label Content="Right stick - Min" VerticalAlignment="Center" ToolTip="Resting area of the right stick (camera).&#x0a;Raise it if the camera drifts."/>
+                                            <Slider Grid.Column="1" x:Name="sld_RS_DeadzoneMin" Minimum="0" Maximum="32767" Value="3000" SmallChange="100" LargeChange="1000" TickFrequency="1000" TickPlacement="BottomRight" Foreground="White" VerticalAlignment="Center" Margin="5,0" Tag="{Binding ElementName=val_RS_DeadzoneMin}" ToolTip="Resting area of the right stick (camera).&#x0a;Raise it if the camera drifts."/>
+                                            <TextBlock Grid.Column="2" x:Name="val_RS_DeadzoneMin" Text="{Binding Value, ElementName=sld_RS_DeadzoneMin, StringFormat=F0, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,6,0"/>
+                                        </Grid>
+                                        <Grid Margin="0,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="210"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="70"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Label Content="Right stick - Max" VerticalAlignment="Center" ToolTip="How far you must push the right stick to get 100%."/>
+                                            <Slider Grid.Column="1" x:Name="sld_RS_DeadzoneMax" Minimum="0" Maximum="32767" Value="22000" SmallChange="100" LargeChange="1000" TickFrequency="1000" TickPlacement="BottomRight" Foreground="White" VerticalAlignment="Center" Margin="5,0" Tag="{Binding ElementName=val_RS_DeadzoneMax}" ToolTip="How far you must push the right stick to get 100%."/>
+                                            <TextBlock Grid.Column="2" x:Name="val_RS_DeadzoneMax" Text="{Binding Value, ElementName=sld_RS_DeadzoneMax, StringFormat=F0, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,6,0"/>
+                                        </Grid>
+                                        <Separator Height="6" Background="#FF736554" Margin="0,8,0,0"/>
+                                        <TextBlock Text="Stick sensitivity" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,14,0,2"/>
+                                        <TextBlock Text="1.0 = normal. 1.5 = 50% faster. 0.5 = half speed. LS is movement, RS is the camera." Foreground="#A8A8A8" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,6"/>
+                                        <Grid Margin="0,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="210"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="70"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Label Content="Left stick - X" VerticalAlignment="Center" ToolTip="Movement sensitivity, horizontal. 1.0 = normal."/>
+                                            <Slider Grid.Column="1" x:Name="sld_LS_Sensitivity_X" Minimum="0.1" Maximum="3.0" Value="1.0" SmallChange="0.05" LargeChange="0.25" TickFrequency="0.25" TickPlacement="BottomRight" Foreground="White" VerticalAlignment="Center" Margin="5,0" Tag="{Binding ElementName=val_LS_Sensitivity_X}" ToolTip="Movement sensitivity, horizontal. 1.0 = normal."/>
+                                            <TextBlock Grid.Column="2" x:Name="val_LS_Sensitivity_X" Text="{Binding Value, ElementName=sld_LS_Sensitivity_X, StringFormat=F2, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,6,0"/>
+                                        </Grid>
+                                        <Grid Margin="0,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="210"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="70"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Label Content="Left stick - Y" VerticalAlignment="Center" ToolTip="Movement sensitivity, vertical. 1.0 = normal."/>
+                                            <Slider Grid.Column="1" x:Name="sld_LS_Sensitivity_Y" Minimum="0.1" Maximum="3.0" Value="1.0" SmallChange="0.05" LargeChange="0.25" TickFrequency="0.25" TickPlacement="BottomRight" Foreground="White" VerticalAlignment="Center" Margin="5,0" Tag="{Binding ElementName=val_LS_Sensitivity_Y}" ToolTip="Movement sensitivity, vertical. 1.0 = normal."/>
+                                            <TextBlock Grid.Column="2" x:Name="val_LS_Sensitivity_Y" Text="{Binding Value, ElementName=sld_LS_Sensitivity_Y, StringFormat=F2, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,6,0"/>
+                                        </Grid>
+                                        <Grid Margin="0,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="210"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="70"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Label Content="Right stick - X (camera)" VerticalAlignment="Center" ToolTip="Camera sensitivity, horizontal. 1.5 = 50% faster."/>
+                                            <Slider Grid.Column="1" x:Name="sld_RS_Sensitivity_X" Minimum="0.1" Maximum="3.0" Value="1.5" SmallChange="0.05" LargeChange="0.25" TickFrequency="0.25" TickPlacement="BottomRight" Foreground="White" VerticalAlignment="Center" Margin="5,0" Tag="{Binding ElementName=val_RS_Sensitivity_X}" ToolTip="Camera sensitivity, horizontal. 1.5 = 50% faster."/>
+                                            <TextBlock Grid.Column="2" x:Name="val_RS_Sensitivity_X" Text="{Binding Value, ElementName=sld_RS_Sensitivity_X, StringFormat=F2, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,6,0"/>
+                                        </Grid>
+                                        <Grid Margin="0,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="210"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="70"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Label Content="Right stick - Y (camera)" VerticalAlignment="Center" ToolTip="Camera sensitivity, vertical. 1.5 = 50% faster."/>
+                                            <Slider Grid.Column="1" x:Name="sld_RS_Sensitivity_Y" Minimum="0.1" Maximum="3.0" Value="1.5" SmallChange="0.05" LargeChange="0.25" TickFrequency="0.25" TickPlacement="BottomRight" Foreground="White" VerticalAlignment="Center" Margin="5,0" Tag="{Binding ElementName=val_RS_Sensitivity_Y}" ToolTip="Camera sensitivity, vertical. 1.5 = 50% faster."/>
+                                            <TextBlock Grid.Column="2" x:Name="val_RS_Sensitivity_Y" Text="{Binding Value, ElementName=sld_RS_Sensitivity_Y, StringFormat=F2, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,6,0"/>
+                                        </Grid>
+                                        <Separator Height="6" Background="#FF736554" Margin="0,8,0,0"/>
+                                        <TextBlock Text="Triggers (0 - 32767)" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,14,0,2"/>
+                                        <TextBlock Text="Deadzone = how far you must pull before the game sees anything (raising it stops accidental heavy attacks from a resting finger). Activation threshold = the point counted as fully pulled (lowering it gives a hair trigger)." Foreground="#A8A8A8" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,6"/>
+                                        <Grid Margin="0,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="210"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="70"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Label Content="LT - Deadzone" VerticalAlignment="Center" ToolTip="How far you must pull LT before the game sees anything."/>
+                                            <Slider Grid.Column="1" x:Name="sld_LT_Deadzone" Minimum="0" Maximum="32767" Value="1000" SmallChange="100" LargeChange="1000" TickFrequency="1000" TickPlacement="BottomRight" Foreground="White" VerticalAlignment="Center" Margin="5,0" Tag="{Binding ElementName=val_LT_Deadzone}" ToolTip="How far you must pull LT before the game sees anything."/>
+                                            <TextBlock Grid.Column="2" x:Name="val_LT_Deadzone" Text="{Binding Value, ElementName=sld_LT_Deadzone, StringFormat=F0, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,6,0"/>
+                                        </Grid>
+                                        <Grid Margin="0,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="210"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="70"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Label Content="RT - Deadzone" VerticalAlignment="Center" ToolTip="How far you must pull RT before the game sees anything.&#x0a;Raising it stops accidental heavy attacks from a resting finger."/>
+                                            <Slider Grid.Column="1" x:Name="sld_RT_Deadzone" Minimum="0" Maximum="32767" Value="4000" SmallChange="100" LargeChange="1000" TickFrequency="1000" TickPlacement="BottomRight" Foreground="White" VerticalAlignment="Center" Margin="5,0" Tag="{Binding ElementName=val_RT_Deadzone}" ToolTip="How far you must pull RT before the game sees anything.&#x0a;Raising it stops accidental heavy attacks from a resting finger."/>
+                                            <TextBlock Grid.Column="2" x:Name="val_RT_Deadzone" Text="{Binding Value, ElementName=sld_RT_Deadzone, StringFormat=F0, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,6,0"/>
+                                        </Grid>
+                                        <Grid Margin="0,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="210"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="70"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Label Content="LT - Activation threshold" VerticalAlignment="Center" ToolTip="The point counted as fully pulled for LT.&#x0a;Lowering it gives a hair trigger."/>
+                                            <Slider Grid.Column="1" x:Name="sld_LT_ActivationThreshold" Minimum="0" Maximum="32767" Value="30000" SmallChange="100" LargeChange="1000" TickFrequency="1000" TickPlacement="BottomRight" Foreground="White" VerticalAlignment="Center" Margin="5,0" Tag="{Binding ElementName=val_LT_ActivationThreshold}" ToolTip="The point counted as fully pulled for LT.&#x0a;Lowering it gives a hair trigger."/>
+                                            <TextBlock Grid.Column="2" x:Name="val_LT_ActivationThreshold" Text="{Binding Value, ElementName=sld_LT_ActivationThreshold, StringFormat=F0, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,6,0"/>
+                                        </Grid>
+                                        <Grid Margin="0,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="210"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="70"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Label Content="RT - Activation threshold" VerticalAlignment="Center" ToolTip="The point counted as fully pulled for RT.&#x0a;Lowering it gives a hair trigger."/>
+                                            <Slider Grid.Column="1" x:Name="sld_RT_ActivationThreshold" Minimum="0" Maximum="32767" Value="30000" SmallChange="100" LargeChange="1000" TickFrequency="1000" TickPlacement="BottomRight" Foreground="White" VerticalAlignment="Center" Margin="5,0" Tag="{Binding ElementName=val_RT_ActivationThreshold}" ToolTip="The point counted as fully pulled for RT.&#x0a;Lowering it gives a hair trigger."/>
+                                            <TextBlock Grid.Column="2" x:Name="val_RT_ActivationThreshold" Text="{Binding Value, ElementName=sld_RT_ActivationThreshold, StringFormat=F0, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,6,0"/>
+                                        </Grid>
+                                        <Separator Height="6" Background="#FF736554" Margin="0,8,0,0"/>
+                                        <TextBlock Text="Rumble" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,14,0,2"/>
+                                        <TextBlock Text="1.0 = normal strength. 0 turns a motor off. Left is heavy impacts, right is light feedback." Foreground="#A8A8A8" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,6"/>
+                                        <Grid Margin="0,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="210"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="70"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Label Content="Left motor (heavy impacts)" VerticalAlignment="Center" ToolTip="Left motor strength. 1.0 = normal, 0 = off."/>
+                                            <Slider Grid.Column="1" x:Name="sld_Rumble_LeftMotor" Minimum="0" Maximum="2.0" Value="1.0" SmallChange="0.05" LargeChange="0.25" TickFrequency="0.25" TickPlacement="BottomRight" Foreground="White" VerticalAlignment="Center" Margin="5,0" Tag="{Binding ElementName=val_Rumble_LeftMotor}" ToolTip="Left motor strength. 1.0 = normal, 0 = off."/>
+                                            <TextBlock Grid.Column="2" x:Name="val_Rumble_LeftMotor" Text="{Binding Value, ElementName=sld_Rumble_LeftMotor, StringFormat=F2, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,6,0"/>
+                                        </Grid>
+                                        <Grid Margin="0,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="210"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="70"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Label Content="Right motor (light feedback)" VerticalAlignment="Center" ToolTip="Right motor strength. 1.0 = normal, 0 = off."/>
+                                            <Slider Grid.Column="1" x:Name="sld_Rumble_RightMotor" Minimum="0" Maximum="2.0" Value="1.0" SmallChange="0.05" LargeChange="0.25" TickFrequency="0.25" TickPlacement="BottomRight" Foreground="White" VerticalAlignment="Center" Margin="5,0" Tag="{Binding ElementName=val_Rumble_RightMotor}" ToolTip="Right motor strength. 1.0 = normal, 0 = off."/>
+                                            <TextBlock Grid.Column="2" x:Name="val_Rumble_RightMotor" Text="{Binding Value, ElementName=sld_Rumble_RightMotor, StringFormat=F2, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,6,0"/>
+                                        </Grid>
+                                        <Separator Height="6" Background="#FF736554" Margin="0,8,0,0"/>
+                                        <TextBlock Text="Jump protection" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,14,0,2"/>
+                                        <CheckBox x:Name="chk_MUTE_JUMP_FROM_B" Content="Mute jump from the roll / sprint button (MUTE_JUMP_FROM_B)" Foreground="White" Margin="0,4,0,0" ToolTip="The game has no jump button: a jump is 'let go of the run button while running, then press it again straight away'. That is easy to do by accident.&#x0a;ON: your normal roll/sprint button can no longer jump. Tap to roll, hold to sprint, backstep and Cancel are untouched.&#x0a;OFF: the button behaves exactly as the game made it, jumps included.&#x0a;This does NOT disable the JUMP_ONLY macro."/>
+                                        <TextBlock Text="ON: the roll/sprint button can no longer jump (a press right after a sprint is swallowed for the length of JumpGuard_Ms). Everything else it does is untouched. This does NOT disable the JUMP_ONLY macro: to keep jumping, turn this on and put JUMP_ONLY on a button of its own. A preset may override this." Foreground="#A8A8A8" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,6"/>
+                                        <Separator Height="6" Background="#FF736554" Margin="0,8,0,0"/>
+                                        <TextBlock Text="4. ADVANCED - you should not need to change these" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,14,0,2"/>
+                                        <TextBlock Text="These were measured against the game and are the same on every PC, so they are built in. Tick a box only if you have a reason to; unticked values are left switched off (commented out) in the .ini." Foreground="#A8A8A8" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,6"/>
+                                        <Border Background="#2D2D2D" BorderBrush="#5A4A3A" BorderThickness="1" CornerRadius="5" Padding="8" Margin="0,3" ToolTip="How long the game needs the run button held before it commits to a run. Everything about sprinting and jumping is timed from this. Raise it if a quick tap of the sprint macro still rolls you. (Built-in value: 800)">
+                                            <StackPanel>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <CheckBox x:Name="chkAdv_RunState_Ms" Content="RunState_Ms" Foreground="White" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                                    <TextBox x:Name="txtAdv_RunState_Ms" Width="70" Text="800" VerticalAlignment="Center"/>
+                                                    <Label Content="ms"/>
+                                                </StackPanel>
+                                                <TextBlock Text="How long the game needs the run button held before it commits to a run. Everything about sprinting and jumping is timed from this. Raise it if a quick tap of the sprint macro still rolls you. (Built-in value: 800)" Foreground="#B8B8B8" FontSize="12" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <Border Background="#2D2D2D" BorderBrush="#5A4A3A" BorderThickness="1" CornerRadius="5" Padding="8" Margin="0,3" ToolTip="After a sprint ends, sprint presses are ignored for this long so the game leaves the run state and your next press sprints instead of jumping. Raise it if mashing sprint still jumps. Lower it if sprinting feels slow to start again after you let go. (Built-in value: 500)">
+                                            <StackPanel>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <CheckBox x:Name="chkAdv_JumpGuard_Ms" Content="JumpGuard_Ms" Foreground="White" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                                    <TextBox x:Name="txtAdv_JumpGuard_Ms" Width="70" Text="500" VerticalAlignment="Center"/>
+                                                    <Label Content="ms"/>
+                                                </StackPanel>
+                                                <TextBlock Text="After a sprint ends, sprint presses are ignored for this long so the game leaves the run state and your next press sprints instead of jumping. Raise it if mashing sprint still jumps. Lower it if sprinting feels slow to start again after you let go. (Built-in value: 500)" Foreground="#B8B8B8" FontSize="12" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+                        </TabControl>
+                        <Grid Grid.Row="1" Margin="5,0,5,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button x:Name="BtnSaveController" Grid.Column="0" Content="SAVE Controller settings" Background="#FF8C00" Foreground="Black" FontWeight="Bold" FontSize="14" Click="BtnSaveController_Click" ToolTip="Writes every setting of the 4 tabs into DDTMControllerMappings.ini (comments are kept)."/>
+                            <Button x:Name="BtnLoadControllerDefaults" Grid.Column="1" Content="Load default settings" Click="BtnLoadControllerDefaults_Click" FontSize="14" ToolTip="Fills all 4 tabs with the default values. Nothing is written until you press SAVE."/>
+                            <Label x:Name="labelControllerSaved" Grid.Column="2" Content="Saved!" Foreground="#FF3C7742" FontSize="13" VerticalAlignment="Center" Visibility="Hidden"/>
+                        </Grid>
+                    </Grid>
+                </Grid>
             </TabItem>
         </TabControl>
         <!-- Exit Button -->

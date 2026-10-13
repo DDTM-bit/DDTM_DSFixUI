@@ -40,6 +40,7 @@ namespace DDTM_DSFixUI
             }
 
             InitializeComponent();
+            InitControllerTab();   // DDTM Controller tab (MainWindow.Controller.cs)
             // Restrict input to digits/decimals where appropriate
             txtFpsLimit.PreviewTextInput += NumericOnly_PreviewTextInput;
             txtFpsThreshold.PreviewTextInput += NumericOnly_PreviewTextInput;
@@ -219,7 +220,7 @@ namespace DDTM_DSFixUI
             {
                 MessageBox.Show("DSfixKeys.ini was not found in the same folder as the program.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 Application.Current.Shutdown();
-                
+
             }
 
             // 1. Load DSFix.ini
@@ -261,6 +262,10 @@ namespace DDTM_DSFixUI
                     case "hudScaleBottomLeft": SetSliderByValue(sldHudScaleBottomLeft, value); break;
                     case "hudScaleBottomRight": SetSliderByValue(sldHudScaleBottomRight, value); break;
                     case "hudScaleBottomCenter": SetSliderByValue(sldHudScaleBottomCenter, value); break;
+                    case "menuScale": SetSliderByValue(sldMenuScale, value); break;
+                    case "listWindowScale": SetSliderByValue(sldListWindowScale, value); break;
+                    case "promptScale": SetSliderByValue(sldPromptScale, value); break;
+                    case "subtitleScale": SetSliderByValue(sldSubtitleScale, value); break;
                     case "hudTopLeftOpacity": txtHudTopLeftOpacity.Text = value; break;
                     case "hudBottomLeftOpacity": txtHudBottomLeftOpacity.Text = value; break;
                     case "hudBottomRightOpacity": txtHudBottomRightOpacity.Text = value; break;
@@ -333,7 +338,7 @@ namespace DDTM_DSFixUI
                                                           "Change Settings", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (result == MessageBoxResult.Yes)
             {
-            
+
                 chkUnlockFPS.IsChecked = true;
                 txtFpsLimit.Text = "60";
                 txtFpsThreshold.Text = "20";
@@ -353,28 +358,35 @@ namespace DDTM_DSFixUI
                 chkEnableTextureDumping.IsChecked = false;
                 chkEnableTexturePrefetch.IsChecked = false;
                 chkEnableShaderDumping.IsChecked = false;
-                chkEnableShaderOverride.IsChecked= false;
+                chkEnableShaderOverride.IsChecked = false;
                 cmbPresentResolution.Text = "0x0";
                 cmbFilteringOverride.SelectedIndex = 0;
                 chkEnableHudMod.IsChecked = false;
-                chkCaptureCursor.IsChecked= false;
+                chkCaptureCursor.IsChecked = false;
                 cmbOverrideLanguage.SelectedIndex = 0;
                 txtScreenshotDir.Text = ".";
                 txtD3dAdapterOverride.Text = "-1";
                 cmbLogLevel.SelectedIndex = 0;
-      
-                chkSkipIntro.IsChecked = true;
+
+                //check dinput8 wrapper controller
+                string DDTMControllerdllPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DDTMControllerFix.dll");
+                if (File.Exists(DDTMControllerdllPath))
+                {
+                    txtDinput8dllWrapper.Text = "DDTMControllerFix.dll";
+                }
+
+        chkSkipIntro.IsChecked = true;
 
                 if (screenWidth == 1024) // 1024x768
                 {
                     cmbRenderResolution.Text = "1024x768";
-                    cmbDofOverrideResolution.Text = "0";
+                    cmbDofOverrideResolution.Text = "540";
                     cmbDofBlurAmount.SelectedIndex = 0; // 0 or 1
                 }
                 else if (screenWidth == 1280) // 1280x720
                 {
                     cmbRenderResolution.Text = "1280x720";
-                    cmbDofOverrideResolution.Text = "0";
+                    cmbDofOverrideResolution.Text = "540";
                     cmbDofBlurAmount.SelectedIndex = 0; // 0 or 1
                 }
                 else if (screenWidth == 1366) // 1366x768
@@ -490,6 +502,10 @@ namespace DDTM_DSFixUI
                 $"hudScaleBottomLeft={GetSliderValue(sldHudScaleBottomLeft)}",
                 $"hudScaleBottomRight={GetSliderValue(sldHudScaleBottomRight)}",
                 $"hudScaleBottomCenter={GetSliderValue(sldHudScaleBottomCenter)}",
+                $"menuScale={GetSliderValue(sldMenuScale)}",
+                $"listWindowScale={GetSliderValue(sldListWindowScale)}",
+                $"promptScale={GetSliderValue(sldPromptScale)}",
+                $"subtitleScale={GetSliderValue(sldSubtitleScale)}",
                 $"hudTopLeftOpacity={txtHudTopLeftOpacity.Text}",
                 $"hudBottomLeftOpacity={txtHudBottomLeftOpacity.Text}",
                 $"hudBottomRightOpacity={txtHudBottomRightOpacity.Text}",
@@ -530,7 +546,7 @@ namespace DDTM_DSFixUI
                 $"reloadSSAOEffect={txtKeyReloadSSAO.Text}|{chkKeyReloadSSAO.IsChecked}",
                 $"togglePaused={txtKeyTogglePaused.Text}|{chkKeyTogglePaused.IsChecked}"
             };
-            
+
             string localConfigPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DDTM_DSFixUI_LocalConfig.txt");
 
             File.WriteAllLines(localConfigPath, localConfig);
@@ -584,6 +600,10 @@ namespace DDTM_DSFixUI
                     case "hudScaleBottomLeft": SetSliderByValue(sldHudScaleBottomLeft, value); break;
                     case "hudScaleBottomRight": SetSliderByValue(sldHudScaleBottomRight, value); break;
                     case "hudScaleBottomCenter": SetSliderByValue(sldHudScaleBottomCenter, value); break;
+                    case "menuScale": SetSliderByValue(sldMenuScale, value); break;
+                    case "listWindowScale": SetSliderByValue(sldListWindowScale, value); break;
+                    case "promptScale": SetSliderByValue(sldPromptScale, value); break;
+                    case "subtitleScale": SetSliderByValue(sldSubtitleScale, value); break;
                     case "hudTopLeftOpacity": txtHudTopLeftOpacity.Text = value; break;
                     case "hudBottomLeftOpacity": txtHudBottomLeftOpacity.Text = value; break;
                     case "hudBottomRightOpacity": txtHudBottomRightOpacity.Text = value; break;
@@ -691,6 +711,10 @@ namespace DDTM_DSFixUI
                     case "hudScaleBottomLeft": lines[i] = $"hudScaleBottomLeft {GetSliderValue(sldHudScaleBottomLeft)}"; break;
                     case "hudScaleBottomRight": lines[i] = $"hudScaleBottomRight {GetSliderValue(sldHudScaleBottomRight)}"; break;
                     case "hudScaleBottomCenter": lines[i] = $"hudScaleBottomCenter {GetSliderValue(sldHudScaleBottomCenter)}"; break;
+                    case "menuScale": lines[i] = $"menuScale {GetSliderValue(sldMenuScale)}"; break;
+                    case "listWindowScale": lines[i] = $"listWindowScale {GetSliderValue(sldListWindowScale)}"; break;
+                    case "promptScale": lines[i] = $"promptScale {GetSliderValue(sldPromptScale)}"; break;
+                    case "subtitleScale": lines[i] = $"subtitleScale {GetSliderValue(sldSubtitleScale)}"; break;
                     case "hudTopLeftOpacity": lines[i] = $"hudTopLeftOpacity {txtHudTopLeftOpacity.Text}"; break;
                     case "hudBottomLeftOpacity": lines[i] = $"hudBottomLeftOpacity {txtHudBottomLeftOpacity.Text}"; break;
                     case "hudBottomRightOpacity": lines[i] = $"hudBottomRightOpacity {txtHudBottomRightOpacity.Text}"; break;
@@ -718,6 +742,23 @@ namespace DDTM_DSFixUI
                     case "logLevel": lines[i] = $"logLevel {GetComboBoxValue(cmbLogLevel)}"; break;
                 }
             }
+            // Newer settings: append them if the .ini does not contain them yet
+            var newerSliders = new (string Key, System.Windows.Controls.Slider Slider)[]
+            {
+                ("hudScaleBottomCenter", sldHudScaleBottomCenter),
+                ("menuScale", sldMenuScale),
+                ("listWindowScale", sldListWindowScale),
+                ("promptScale", sldPromptScale),
+                ("subtitleScale", sldSubtitleScale)
+            };
+            var withNew = new List<string>(lines);
+            foreach (var (key, slider) in newerSliders)
+            {
+                // exact key match on an active (not commented) line
+                bool exists = withNew.Any(l => l.TrimStart().Split(new[] { ' ', '\t' }, 2)[0] == key);
+                if (!exists) withNew.Add($"{key} {GetSliderValue(slider)}");
+            }
+            lines = withNew.ToArray();
             File.WriteAllLines(dsfixPath, lines);
 
             // --- 2. SAVE DSFIXKEYS.INI ---
@@ -844,9 +885,9 @@ namespace DDTM_DSFixUI
 
             if (int.TryParse(txtFpsThreshold.Text, out int value))
             {
-                if (value > 144)
+                if (value > 120)
                 {
-                    txtFpsThreshold.Text = "144";
+                    txtFpsThreshold.Text = "120";
                     txtFpsThreshold.CaretIndex = txtFpsThreshold.Text.Length;
                 }
                 else if (value < 1)
@@ -859,24 +900,30 @@ namespace DDTM_DSFixUI
 
         private void chkEnableHudMod_Checked(object sender, RoutedEventArgs e)
         {
-            if (wrappanelhud2 == null) return;
+            if (wrappanelhud3 == null) return;
             sep1.Visibility = Visibility.Visible;
             txtblockhud1.Visibility = Visibility.Visible;
             wrappanelhud1.Visibility = Visibility.Visible;
             sep2.Visibility = Visibility.Visible;
             txtblockhud2.Visibility = Visibility.Visible;
             wrappanelhud2.Visibility = Visibility.Visible;
+            sep3.Visibility = Visibility.Visible;
+            txtblockhud3.Visibility = Visibility.Visible;
+            wrappanelhud3.Visibility = Visibility.Visible;
         }
 
         private void chkEnableHudMod_Unchecked(object sender, RoutedEventArgs e)
         {
-            if (wrappanelhud2 == null) return;
+            if (wrappanelhud3 == null) return;
             sep1.Visibility = Visibility.Hidden;
             txtblockhud1.Visibility = Visibility.Hidden;
             wrappanelhud1.Visibility = Visibility.Hidden;
             sep2.Visibility = Visibility.Hidden;
             txtblockhud2.Visibility = Visibility.Hidden;
             wrappanelhud2.Visibility = Visibility.Hidden;
+            sep3.Visibility = Visibility.Hidden;
+            txtblockhud3.Visibility = Visibility.Hidden;
+            wrappanelhud3.Visibility = Visibility.Hidden;
         }
 
         private void chkEnableBackups_Checked(object sender, RoutedEventArgs e)
@@ -947,7 +994,7 @@ namespace DDTM_DSFixUI
                 Multiselect = false
             };
 
-           
+
             if (dialog.ShowDialog() == true)
             {
                 txtScreenshotDir.Text = dialog.FolderName; // Atenție, se folosește FolderName, nu FileName
@@ -999,6 +1046,9 @@ namespace DDTM_DSFixUI
             {
                 if (child is DependencyObject depChild)
                 {
+                    // the DDTM Controller tab keeps its own saved state (see MainWindow.Controller.cs)
+                    if (ReferenceEquals(depChild, tabController)) continue;
+
                     if (depChild is System.Windows.Controls.TextBox txt)
                     {
                         originalControlValues[txt] = txt.Text;
