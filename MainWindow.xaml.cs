@@ -291,6 +291,8 @@ namespace DDTM_DSFixUI
                     case "dinput8dllWrapper": txtDinput8dllWrapper.Text = value; break;
                     case "d3dAdapterOverride": txtD3dAdapterOverride.Text = value; break;
                     case "logLevel": SetComboBoxByValue(cmbLogLevel, value); break;
+                    case "swapConfirmIcons": chkSwapConfirmIcons.IsChecked = value == "1"; break;
+                    case "swapXYIcons": chkSwapXYIcons.IsChecked = value == "1"; break;
                 }
             }
             SetComboBoxByValue(cmbRenderResolution, $"{rW}x{rH}");
@@ -470,7 +472,29 @@ namespace DDTM_DSFixUI
         private void MenuLoadDSFix_Click(object sender, RoutedEventArgs e)
         {
             LoadDSFixIni();
-            MessageBox.Show("Settings from DSfix.ini and DSfixKeys.ini have been reloaded.", "Reloaded", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            // Also reload the DDTM Controller tab from DDTMControllerMappings.ini
+            string reloaded = "DSfix.ini and DSfixKeys.ini";
+            if (File.Exists(controllerIniPath))
+            {
+                try
+                {
+                    LoadControllerIni();        // fills the 4 controller tabs and marks them as saved
+                    controllerLoaded = true;
+                    reloaded = "DSfix.ini, DSfixKeys.ini and DDTMControllerMappings.ini";
+                }
+                catch (Exception ex)
+                {
+                    controllerLoaded = false;   // the tab will try again when it is opened
+                    MessageBox.Show("Could not read DDTMControllerMappings.ini:\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            else
+            {
+                controllerLoaded = false;       // the tab shows its "file missing" message when opened
+            }
+
+            MessageBox.Show($"Settings from {reloaded} have been reloaded.", "Reloaded", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void MenuSaveLocal_Click(object sender, RoutedEventArgs e)
@@ -531,6 +555,8 @@ namespace DDTM_DSFixUI
                 $"dinput8dllWrapper={txtDinput8dllWrapper.Text}",
                 $"d3dAdapterOverride={txtD3dAdapterOverride.Text}",
                 $"logLevel={GetComboBoxValue(cmbLogLevel)}",
+                $"swapConfirmIcons={(chkSwapConfirmIcons.IsChecked == true ? "1" : "0")}",
+                $"swapXYIcons={(chkSwapXYIcons.IsChecked == true ? "1" : "0")}",
 
                 // Keys mappings
                 $"toggleCursorCapture={txtKeyToggleCursorCapture.Text}|{chkKeyToggleCursorCapture.IsChecked}",
@@ -629,6 +655,8 @@ namespace DDTM_DSFixUI
                     case "dinput8dllWrapper": txtDinput8dllWrapper.Text = value; break;
                     case "d3dAdapterOverride": txtD3dAdapterOverride.Text = value; break;
                     case "logLevel": SetComboBoxByValue(cmbLogLevel, value); break;
+                    case "swapConfirmIcons": chkSwapConfirmIcons.IsChecked = value == "1"; break;
+                    case "swapXYIcons": chkSwapXYIcons.IsChecked = value == "1"; break;
 
                     default:
                         // Handle Keys formatted as "Action=Key|IsChecked"
@@ -740,6 +768,8 @@ namespace DDTM_DSFixUI
                     case "dinput8dllWrapper": lines[i] = $"dinput8dllWrapper {txtDinput8dllWrapper.Text}"; break;
                     case "d3dAdapterOverride": lines[i] = $"d3dAdapterOverride {txtD3dAdapterOverride.Text}"; break;
                     case "logLevel": lines[i] = $"logLevel {GetComboBoxValue(cmbLogLevel)}"; break;
+                    case "swapConfirmIcons": lines[i] = $"swapConfirmIcons {(chkSwapConfirmIcons.IsChecked == true ? "1" : "0")}"; break;
+                    case "swapXYIcons": lines[i] = $"swapXYIcons {(chkSwapXYIcons.IsChecked == true ? "1" : "0")}"; break;
                 }
             }
             // Newer settings: append them if the .ini does not contain them yet
@@ -757,6 +787,16 @@ namespace DDTM_DSFixUI
                 // exact key match on an active (not commented) line
                 bool exists = withNew.Any(l => l.TrimStart().Split(new[] { ' ', '\t' }, 2)[0] == key);
                 if (!exists) withNew.Add($"{key} {GetSliderValue(slider)}");
+            }
+            var newerChecks = new (string Key, System.Windows.Controls.CheckBox Check)[]
+            {
+                ("swapConfirmIcons", chkSwapConfirmIcons),
+                ("swapXYIcons", chkSwapXYIcons)
+            };
+            foreach (var (key, check) in newerChecks)
+            {
+                bool exists = withNew.Any(l => l.TrimStart().Split(new[] { ' ', '\t' }, 2)[0] == key);
+                if (!exists) withNew.Add($"{key} {(check.IsChecked == true ? "1" : "0")}");
             }
             lines = withNew.ToArray();
             File.WriteAllLines(dsfixPath, lines);

@@ -228,11 +228,20 @@ namespace DDTM_DSFixUI
         // ------------------------------------------------------------------
         private void LoadControllerIni()
         {
-            var kv = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            var back = new List<string>();
-            var advOff = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            ReadControllerFile(controllerIniPath, out var kv, out var back, out var advOff);
+            ApplyControllerValues(kv, back, advOff);
+            SnapshotCurrentValues(tabController);   // this is the "saved" state for change colouring
+        }
 
-            foreach (string line in File.ReadAllLines(controllerIniPath))
+        // Parses a DDTMControllerMappings.ini (or a profile file with the same format)
+        private static void ReadControllerFile(string path, out Dictionary<string, string> kv,
+                                               out List<string> back, out Dictionary<string, string> advOff)
+        {
+            kv = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            back = new List<string>();
+            advOff = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (string line in File.ReadAllLines(path))
             {
                 string t = line.Trim();
                 if (t.Length == 0) continue;
@@ -253,9 +262,6 @@ namespace DDTM_DSFixUI
                 if (key.Equals("BACK", StringComparison.OrdinalIgnoreCase)) back.Add(val);
                 else if (!kv.ContainsKey(key)) kv[key] = val;
             }
-
-            ApplyControllerValues(kv, back, advOff);
-            SnapshotCurrentValues(tabController);   // this is the "saved" state for change colouring
         }
 
         // Puts values into the controls (used by Load and by Load defaults)
@@ -387,6 +393,30 @@ namespace DDTM_DSFixUI
                 return;
             }
 
+            List<string> output = BuildControllerIniLines(File.ReadAllLines(controllerIniPath));
+            if (output == null) return;   // invalid value, user already warned
+
+            try
+            {
+                File.WriteAllLines(controllerIniPath, output);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Could not write DDTMControllerMappings.ini:\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            SnapshotCurrentValues(tabController);
+            ShowControllerSaved();
+
+            // keep the in-game A/B and X/Y button icons in line with the mapping (DSfix.ini)
+            SyncPromptIconsWithMapping();
+        }
+
+        // Builds the full .ini text from the 4 sub tabs, using 'template' (an existing file's lines)
+        // so all comments are kept. Returns null when a value is invalid.
+        private List<string> BuildControllerIniLines(string[] template)
+        {
             // ---- collect values from the 4 sub tabs ----
             var values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             values["Preset"] = GetSelectedPreset();
@@ -420,14 +450,14 @@ namespace DDTM_DSFixUI
                 if (!int.TryParse(text, NumberStyles.None, CultureInfo.InvariantCulture, out int n) || n < 1)
                 {
                     MessageBox.Show($"{k} must be a whole number greater than 0.", "Invalid value", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
+                    return null;
                 }
                 values[k] = n.ToString(CultureInfo.InvariantCulture);
                 advEnabled[k] = Ctl<CheckBox>("chkAdv_" + k).IsChecked == true;
             }
 
             // ---- rewrite the file line by line, keeping every comment ----
-            string[] original = File.ReadAllLines(controllerIniPath);
+            string[] original = template ?? Array.Empty<string>();
             var output = new List<string>();
             var written = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             bool backWritten = false;
@@ -489,18 +519,7 @@ namespace DDTM_DSFixUI
                 InsertIntoSection(output, KeySection(kvp.Key), kvp.Key + " = " + kvp.Value);
             }
 
-            try
-            {
-                File.WriteAllLines(controllerIniPath, output);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Could not write DDTMControllerMappings.ini:\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-
-            SnapshotCurrentValues(tabController);
-            ShowControllerSaved();
+            return output;
         }
 
         private async void ShowControllerSaved()
