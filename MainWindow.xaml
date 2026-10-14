@@ -110,8 +110,9 @@
                             <Label Content="Internal rendering resolution: "/>
                             <ComboBox Name="cmbRenderResolution" Width="120" Margin="0,0,50,0" ToolTip="The display width/height&#x0a;0x0 means use the same resolution as rendering.&#x0a;(if in doubt, leave at 0)"/>
 
-                            <Label Content="Present res. (for downscaling): "/>
+                            <Label Content="Present res: "/>
                             <ComboBox Name="cmbPresentResolution" Width="120" ToolTip="The display width/height (0x0 means use the same resolution as rendering)."/>
+                            <Label Content="For downscaling, set Present res. to your monitor's native resolution and Internal rendering resolution higher." FontSize="12" Foreground="DarkGray"/>
                         </WrapPanel>
                         <Separator Height="6" Background="#FF736554" Margin="0,10,0,0"/>
                         <!-- Framerate -->
@@ -142,6 +143,19 @@
                             </ComboBox>
                         </WrapPanel>
                         <Separator Height="6" Background="#FF736554" Margin="0,10,0,0"/>
+                        <!-- Sharpening -->
+                        <TextBlock Text="Sharpening" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,15,0,5"/>
+                        <Grid HorizontalAlignment="Left" Width="560" Margin="0,0,0,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="55"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Content="Sharpen Strength:" VerticalAlignment="Center" ToolTip="for the 3D image after anti-aliasing (the HUD and menus are not sharpened)."/>
+                            <Slider Grid.Column="1" Name="sldSharpenStrength" Minimum="0" Maximum="1" Value="0" TickFrequency="0.05" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Foreground="White" VerticalAlignment="Center" Margin="5,4" Tag="{Binding ElementName=valSharpenStrength}" ToolTip="for the 3D image after anti-aliasing (the HUD and menus are not sharpened)."/>
+                            <TextBlock Grid.Column="2" Name="valSharpenStrength" Text="{Binding Value, ElementName=sldSharpenStrength, StringFormat=F2, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,5,0"/>
+                        </Grid>
+                        <Separator Height="6" Background="#FF736554" Margin="0,10,0,0"/>
                         <!-- Ambient Occlusion -->
                         <TextBlock Text="Ambient Occlusion" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,15,0,5"/>
                         <WrapPanel>
@@ -164,6 +178,7 @@
                                 <ComboBoxItem Content="HBAO"/>
                                 <ComboBoxItem Content="SCAO"/>
                                 <ComboBoxItem Content="VSSAO2" IsSelected="True"/>
+                                
                             </ComboBox>
                         </WrapPanel>
                         <Separator Height="6" Background="#FF736554" Margin="0,10,0,0"/>
@@ -241,7 +256,7 @@
                             <Slider Grid.Row="2" Grid.Column="1" Name="sldHudScaleBottomRight" Minimum="0.5" Maximum="1" Value="1" TickFrequency="0.05" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Foreground="White" VerticalAlignment="Center" Margin="5,4" Tag="{Binding ElementName=valHudScaleBottomRight}" ToolTip="Scales the current souls count."/>
                             <TextBlock Grid.Row="2" Grid.Column="2" Name="valHudScaleBottomRight" Text="{Binding Value, ElementName=sldHudScaleBottomRight, StringFormat=F2, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,5,0"/>
 
-                            <Label Grid.Row="3" Grid.Column="0" Content="Bottom center:" VerticalAlignment="Center"/>
+                            <Label Grid.Row="3" Grid.Column="0" Content="Boss Health bar:" VerticalAlignment="Center"/>
                             <Slider Grid.Row="3" Grid.Column="1" Name="sldHudScaleBottomCenter" Minimum="0.5" Maximum="1" Value="1" TickFrequency="0.05" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Foreground="White" VerticalAlignment="Center" Margin="5,4" Tag="{Binding ElementName=valHudScaleBottomCenter}" ToolTip="Scales the bottom center HUD elements."/>
                             <TextBlock Grid.Row="3" Grid.Column="2" Name="valHudScaleBottomCenter" Text="{Binding Value, ElementName=sldHudScaleBottomCenter, StringFormat=F2, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,5,0"/>
                         </Grid>
@@ -296,6 +311,19 @@
                     <CheckBox Name="chkBorderless" Content="Borderless Fullscreen" Foreground="White" IsChecked="True" ToolTip="Requires windowed mode in-game!"/>
                     <CheckBox Name="chkDisableCursor" Content="Disable Cursor at Startup" Foreground="White" IsChecked="True" Margin="0,5,0,0" ToolTip="Disable mouse cursor at startup"/>
                     <CheckBox Name="chkCaptureCursor" Content="Capture Cursor (Lock to window)" Foreground="White" Margin="0,5,0,0" ToolTip="capture cursor (do not allow it to leave the window)"/>
+                    <Separator Height="25" Background="#FF736554" Margin="0,15,0,0"/>
+                    <!-- In-game fullscreen only -->
+                    <TextBlock Text="This only applies to the in-game fullscreen setting:" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,15,0,5" Height="42"/>
+                    <WrapPanel>
+                        <Label Content="VSync:" Width="62"/>
+                        <ComboBox Name="cmbEnableVsync" Width="170" Margin="0,0,25,0" ToolTip="VSync in the game's fullscreen mode.">
+                            <ComboBoxItem Content="game's choice (default)" IsSelected="True"/>
+                            <ComboBoxItem Content="On"/>
+                            <ComboBoxItem Content="Off"/>
+                        </ComboBox>
+                        <Label Content="Refresh Rate Hz:"/>
+                        <TextBox Name="txtFullscreenHz" Width="60" Text="0" VerticalAlignment="Center" ToolTip="Refresh rate in the game's fullscreen mode: 0 = leave the game's choice (default) or a value such as 120, 144, 165, 180. DSfix checks it against the rates your monitor supports and uses the highest one that is not above this value."/>
+                    </WrapPanel>
                 </StackPanel>
             </TabItem>
 
@@ -438,12 +466,17 @@
                             <TextBox Name="txtKeyToggle30FPSLimit" Width="120" Text="VK_BACK"/>
                         </WrapPanel>
 
-                        <WrapPanel Margin="0,5,0,5" Height="207">
+                        <WrapPanel Margin="0,5,0,5">
                             <CheckBox Name="chkKeyReloadSSAO" Content="Reload SSAO Effect:" Width="200" Foreground="White" VerticalAlignment="Center" IsChecked="True"/>
                             <TextBox Name="txtKeyReloadSSAO" Width="120" Text="VK_NUMPAD5" Margin="0,0,15,0"/>
 
                             <CheckBox Name="chkKeyTogglePaused" Content="Toggle Paused:" Width="190" Foreground="White" VerticalAlignment="Center" IsChecked="False"/>
                             <TextBox Name="txtKeyTogglePaused" Width="120" Text="VK_F9"/>
+                        </WrapPanel>
+
+                        <WrapPanel Margin="0,5,0,5" Height="172">
+                            <CheckBox Name="chkKeyToggleSharpen" Content="Toggle Sharpen:" Width="200" Foreground="White" VerticalAlignment="Center" IsChecked="True" ToolTip="Turns the sharpening effect on/off in game (toggleSharpen in DSfixKeys.ini)."/>
+                            <TextBox Name="txtKeyToggleSharpen" Width="120" Text="VK_F4" Margin="0,0,15,0"/>
                         </WrapPanel>
                         <WrapPanel>
 

@@ -48,6 +48,8 @@ namespace DDTM_DSFixUI
             txtMaxBackups.PreviewTextInput += NumericOnly_PreviewTextInput;
 
             txtHudTopLeftOpacity.PreviewTextInput += NumericAndPointOnly_PreviewTextInput;
+            txtFullscreenHz.PreviewTextInput += NumericOnly_PreviewTextInput;
+            System.Windows.DataObject.AddPastingHandler(txtFullscreenHz, NumericOnly_Pasting);
             txtHudBottomLeftOpacity.PreviewTextInput += NumericAndPointOnly_PreviewTextInput;
             txtHudBottomRightOpacity.PreviewTextInput += NumericAndPointOnly_PreviewTextInput;
             txtBackupInterval.PreviewTextInput += NumericOnly_PreviewTextInput;
@@ -81,6 +83,15 @@ namespace DDTM_DSFixUI
 
             cmbPresentResolution.Items.Add(new System.Windows.Controls.ComboBoxItem { Content = "0x0" });
 
+            // Keep the native resolution selectable even if it isn't in the list (inserted in sorted order)
+            int nativeW = (int)screenWidth, nativeH = (int)screenHeight;
+            if (!sorted.Any(r => r.Item1 == nativeW && r.Item2 == nativeH))
+            {
+                sorted.Add((nativeW, nativeH));
+                sorted = sorted.OrderBy(r => r.Item1 * r.Item2).ThenBy(r => r.Item1).ToList();
+            }
+            string native = $"{nativeW}x{nativeH}";
+
             foreach (var res in sorted)
             {
                 string resString = $"{res.Item1}x{res.Item2}";
@@ -88,20 +99,11 @@ namespace DDTM_DSFixUI
                 // Present (downscaling): all resolutions
                 cmbPresentResolution.Items.Add(new System.Windows.Controls.ComboBoxItem { Content = resString });
 
-                // Render: only resolutions that fit the PC screen
-                if (res.Item1 <= screenWidth && res.Item2 <= screenHeight)
-                {
-                    cmbRenderResolution.Items.Add(new System.Windows.Controls.ComboBoxItem { Content = resString });
-                }
+                // Render: all resolutions (no limit to the display resolution)
+                var renderItem = new System.Windows.Controls.ComboBoxItem { Content = resString };
+                cmbRenderResolution.Items.Add(renderItem);
+                if (resString == native) cmbRenderResolution.SelectedItem = renderItem;   // default = display resolution
             }
-
-            // Keep the native resolution selectable even if it isn't in the list
-            string native = $"{(int)screenWidth}x{(int)screenHeight}";
-            if (!cmbRenderResolution.Items.Cast<System.Windows.Controls.ComboBoxItem>().Any(i => (string)i.Content == native))
-                cmbRenderResolution.Items.Add(new System.Windows.Controls.ComboBoxItem { Content = native });
-
-            if (cmbRenderResolution.Items.Count > 0)
-                cmbRenderResolution.SelectedIndex = cmbRenderResolution.Items.Count - 1;
 
             cmbPresentResolution.SelectedIndex = 0;
         }
@@ -130,11 +132,15 @@ namespace DDTM_DSFixUI
             bool isWindowed = false;
             bool isWidthCorrect = false;
             bool isHeightCorrect = false;
+            bool isWidthFullscreenCorrect = false;
+            bool isHeightFullscreenCorrect = false;
             bool isAaOff = false;
             bool isBlurOff = false;
 
             // Variabilă pentru a urmări dacă citim în interiorul [DisplaySettingWindow]
             bool inDisplaySettingWindow = false;
+            // Variabilă pentru a urmări dacă citim în interiorul [DisplaySettingFullScreen]
+            bool inDisplaySettingFullscreenWindow = false;
 
             foreach (string line in lines)
             {
@@ -144,6 +150,10 @@ namespace DDTM_DSFixUI
                 if (trimmedLine.StartsWith("["))
                 {
                     inDisplaySettingWindow = (trimmedLine == "[DisplaySettingWindow]");
+                }
+                if (trimmedLine.StartsWith("["))
+                {
+                    inDisplaySettingFullscreenWindow = (trimmedLine == "[DisplaySettingFullScreen]");
                 }
 
                 if (trimmedLine == "WindowMode = 1") isWindowed = true;
@@ -156,16 +166,22 @@ namespace DDTM_DSFixUI
                     if (trimmedLine == $"Width = {screenWidth}") isWidthCorrect = true;
                     if (trimmedLine == $"Height = {screenHeight}") isHeightCorrect = true;
                 }
+                // Verifică lățimea și înălțimea DOAR dacă suntem în secțiunea [DisplaySettingFullScreen]
+                if (inDisplaySettingFullscreenWindow)
+                {
+                    if (trimmedLine == $"Width = {screenWidth}") isWidthFullscreenCorrect = true;
+                    if (trimmedLine == $"Height = {screenHeight}") isHeightFullscreenCorrect = true;
+                }
             }
 
-            bool isResCorrect = isWidthCorrect && isHeightCorrect;
+            bool isResCorrect = isWidthCorrect && isHeightCorrect && isWidthFullscreenCorrect && isHeightFullscreenCorrect;
 
             // Adaugă și isResCorrect în condiția de avertizare
             if (!isWindowed || !isAaOff || !isBlurOff || !isResCorrect)
             {
                 string probleme = "";
                 if (!isWindowed) probleme += "- Window Mode not activated (required for Borderless).\n";
-                if (!isResCorrect) probleme += $"- Window resolution setting does not match your display ({screenWidth}x{screenHeight}).\n";
+                if (!isResCorrect) probleme += $"- Game resolution setting does not match your display ({screenWidth}x{screenHeight}).\n";
                 if (!isAaOff) probleme += "- In-game Anti-Aliasing is ON (conflict with DSFix).\n";
                 if (!isBlurOff) probleme += "- In-game Motion Blur is ON.\n";
 
@@ -181,15 +197,20 @@ namespace DDTM_DSFixUI
         private void FixDarkSoulsIni(string[] lines)
         {
             bool inDisplaySettingWindow = false;
+            bool inDisplaySettingFullscreenWindow = false;
 
             for (int i = 0; i < lines.Length; i++)
             {
                 string trimmedLine = lines[i].Trim();
 
-                // Detectează dacă intrăm sau ieșim din secțiunea [DisplaySettingWindow]
+                
                 if (trimmedLine.StartsWith("["))
                 {
                     inDisplaySettingWindow = (trimmedLine == "[DisplaySettingWindow]");
+                }
+                if (trimmedLine.StartsWith("["))
+                {
+                    inDisplaySettingFullscreenWindow = (trimmedLine == "[DisplaySettingFullScreen]");
                 }
 
                 // Setările globale care trebuie modificate
@@ -197,8 +218,13 @@ namespace DDTM_DSFixUI
                 else if (trimmedLine.StartsWith("Antialiasing")) lines[i] = "Antialiasing = 0";
                 else if (trimmedLine.StartsWith("Blur")) lines[i] = "Blur = 0";
 
-                // Modificăm Width și Height DOAR dacă suntem în [DisplaySettingWindow]
+                
                 if (inDisplaySettingWindow)
+                {
+                    if (trimmedLine.StartsWith("Width")) lines[i] = $"Width = {screenWidth}";
+                    else if (trimmedLine.StartsWith("Height")) lines[i] = $"Height = {screenHeight}";
+                }
+                if (inDisplaySettingFullscreenWindow)
                 {
                     if (trimmedLine.StartsWith("Width")) lines[i] = $"Width = {screenWidth}";
                     else if (trimmedLine.StartsWith("Height")) lines[i] = $"Height = {screenHeight}";
@@ -253,6 +279,7 @@ namespace DDTM_DSFixUI
                     case "disableDofScaling": chkDisableDofScaling.IsChecked = value == "1"; break;
                     case "dofBlurAmount": SetComboBoxByValue(cmbDofBlurAmount, value); break;
                     case "filteringOverride": SetComboBoxByValue(cmbFilteringOverride, value); break;
+                    case "sharpenStrength": SetSliderByValue(sldSharpenStrength, value); break;
                     case "unlockFPS": chkUnlockFPS.IsChecked = value == "1"; break;
                     case "FPSlimit": txtFpsLimit.Text = value; break;
                     case "FPSthreshold": txtFpsThreshold.Text = value; break;
@@ -273,6 +300,8 @@ namespace DDTM_DSFixUI
                     case "borderlessFullscreen": chkBorderless.IsChecked = value == "1"; break;
                     case "disableCursor": chkDisableCursor.IsChecked = value == "1"; break;
                     case "captureCursor": chkCaptureCursor.IsChecked = value == "1"; break;
+                    case "enableVsync": SetVsyncValue(value); break;
+                    case "fullscreenHz": txtFullscreenHz.Text = value; break;
 
                     case "enableBackups": chkEnableBackups.IsChecked = value == "1"; break;
                     case "backupInterval": txtBackupInterval.Text = value; break;
@@ -327,6 +356,7 @@ namespace DDTM_DSFixUI
                     case "toggle30FPSLimit": txtKeyToggle30FPSLimit.Text = key; chkKeyToggle30FPSLimit.IsChecked = isEnabled; break;
                     case "reloadSSAOEffect": txtKeyReloadSSAO.Text = key; chkKeyReloadSSAO.IsChecked = isEnabled; break;
                     case "togglePaused": txtKeyTogglePaused.Text = key; chkKeyTogglePaused.IsChecked = isEnabled; break;
+                    case "toggleSharpen": txtKeyToggleSharpen.Text = key; chkKeyToggleSharpen.IsChecked = isEnabled; break;
                 }
             }
             SnapshotCurrentValues(this);
@@ -343,12 +373,13 @@ namespace DDTM_DSFixUI
 
                 chkUnlockFPS.IsChecked = true;
                 txtFpsLimit.Text = "60";
-                txtFpsThreshold.Text = "20";
+                txtFpsThreshold.Text = "28";
                 cmbAaType.Text = "SMAA";
                 cmbAaQuality.SelectedIndex = 4; //Ultra
-                cmbSsaoType.Text = "VSSAO2";
+                cmbSsaoType.Text = "SCAO";
                 cmbSsaoStrength.SelectedIndex = 2; // Medium
-                cmbSsaoScale.SelectedIndex = 0; //High quality;     
+                cmbSsaoScale.SelectedIndex = 0; //High quality;
+                sldSharpenStrength.Value = 0;
                 chkBorderless.IsChecked = true;
                 chkDisableCursor.IsChecked = true;
                 chkEnableBackups.IsChecked = true;
@@ -362,7 +393,7 @@ namespace DDTM_DSFixUI
                 chkEnableShaderDumping.IsChecked = false;
                 chkEnableShaderOverride.IsChecked = false;
                 cmbPresentResolution.Text = "0x0";
-                cmbFilteringOverride.SelectedIndex = 0;
+                cmbFilteringOverride.SelectedIndex = 2;
                 chkEnableHudMod.IsChecked = false;
                 chkCaptureCursor.IsChecked = false;
                 cmbOverrideLanguage.SelectedIndex = 0;
@@ -378,6 +409,9 @@ namespace DDTM_DSFixUI
                 }
 
         chkSkipIntro.IsChecked = true;
+
+                // DarkSouls.ini: borderless needs the in-game windowed mode
+                EnsureDarkSoulsWindowMode();
 
                 if (screenWidth == 1024) // 1024x768
                 {
@@ -457,6 +491,79 @@ namespace DDTM_DSFixUI
             }
         }
 
+        // enableVsync: "-1" = game's choice, "1" = On, "0" = Off (combo order: game's choice, On, Off)
+        private void SetVsyncValue(string value)
+        {
+            switch (value.Trim())
+            {
+                case "1": cmbEnableVsync.SelectedIndex = 1; break;
+                case "0": cmbEnableVsync.SelectedIndex = 2; break;
+                default: cmbEnableVsync.SelectedIndex = 0; break;   // -1 or anything unknown
+            }
+        }
+
+        private string GetVsyncValue()
+        {
+            switch (cmbEnableVsync.SelectedIndex)
+            {
+                case 1: return "1";
+                case 2: return "0";
+                default: return "-1";
+            }
+        }
+
+        // fullscreenHz: whole number, empty = 0 (game's choice)
+        private string GetFullscreenHzValue()
+        {
+            return int.TryParse(txtFullscreenHz.Text.Trim(), out int hz) && hz > 0 ? hz.ToString() : "0";
+        }
+
+        private void NumericOnly_Pasting(object sender, System.Windows.DataObjectPastingEventArgs e)
+        {
+            string text = e.DataObject.GetData(typeof(string)) as string;
+            if (text == null || !System.Text.RegularExpressions.Regex.IsMatch(text, "^[0-9]+$")) e.CancelCommand();
+        }
+
+        // Sets WindowMode = 1 in DarkSouls.ini when it is 0 (keeps the file's encoding)
+        private void EnsureDarkSoulsWindowMode()
+        {
+            if (!File.Exists(darkSoulsIniPath)) return;
+            try
+            {
+                System.Text.Encoding encoding;
+                string[] lines;
+                using (var reader = new StreamReader(darkSoulsIniPath, System.Text.Encoding.UTF8, detectEncodingFromByteOrderMarks: true))
+                {
+                    var list = new List<string>();
+                    string line;
+                    while ((line = reader.ReadLine()) != null) list.Add(line);
+                    lines = list.ToArray();
+                    encoding = reader.CurrentEncoding;
+                }
+
+                bool changed = false;
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (System.Text.RegularExpressions.Regex.IsMatch(lines[i].Trim(), @"^WindowMode\s*=\s*0$"))
+                    {
+                        lines[i] = "WindowMode = 1";
+                        changed = true;
+                    }
+                }
+
+                if (changed)
+                {
+                    File.WriteAllLines(darkSoulsIniPath, lines, encoding);
+                    MessageBox.Show("DarkSouls.ini: in-game Window Mode was OFF and has been set to ON (WindowMode = 1), as needed for borderless fullscreen.",
+                                    "DarkSouls.ini updated", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Could not update DarkSouls.ini:\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         private void SetComboBoxByValue(System.Windows.Controls.ComboBox cmb, string value)
         {
             foreach (System.Windows.Controls.ComboBoxItem item in cmb.Items)
@@ -517,6 +624,7 @@ namespace DDTM_DSFixUI
                 $"disableDofScaling={(chkDisableDofScaling.IsChecked == true ? "1" : "0")}",
                 $"dofBlurAmount={GetComboBoxValue(cmbDofBlurAmount)}",
                 $"filteringOverride={GetComboBoxValue(cmbFilteringOverride)}",
+                $"sharpenStrength={GetSliderValue(sldSharpenStrength)}",
                 $"unlockFPS={(chkUnlockFPS.IsChecked == true ? "1" : "0")}",
                 $"FPSlimit={txtFpsLimit.Text}",
                 $"FPSthreshold={txtFpsThreshold.Text}",
@@ -537,6 +645,8 @@ namespace DDTM_DSFixUI
                 $"borderlessFullscreen={(chkBorderless.IsChecked == true ? "1" : "0")}",
                 $"disableCursor={(chkDisableCursor.IsChecked == true ? "1" : "0")}",
                 $"captureCursor={(chkCaptureCursor.IsChecked == true ? "1" : "0")}",
+                $"enableVsync={GetVsyncValue()}",
+                $"fullscreenHz={GetFullscreenHzValue()}",
 
                 $"enableBackups={(chkEnableBackups.IsChecked == true ? "1" : "0")}",
                 $"backupInterval={txtBackupInterval.Text}",
@@ -570,7 +680,8 @@ namespace DDTM_DSFixUI
                 $"toggleDofGauss={txtKeyToggleDofGauss.Text}|{chkKeyToggleDofGauss.IsChecked}",
                 $"toggle30FPSLimit={txtKeyToggle30FPSLimit.Text}|{chkKeyToggle30FPSLimit.IsChecked}",
                 $"reloadSSAOEffect={txtKeyReloadSSAO.Text}|{chkKeyReloadSSAO.IsChecked}",
-                $"togglePaused={txtKeyTogglePaused.Text}|{chkKeyTogglePaused.IsChecked}"
+                $"togglePaused={txtKeyTogglePaused.Text}|{chkKeyTogglePaused.IsChecked}",
+                $"toggleSharpen={txtKeyToggleSharpen.Text}|{chkKeyToggleSharpen.IsChecked}"
             };
 
             string localConfigPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DDTM_DSFixUI_LocalConfig.txt");
@@ -617,6 +728,7 @@ namespace DDTM_DSFixUI
                     case "disableDofScaling": chkDisableDofScaling.IsChecked = value == "1"; break;
                     case "dofBlurAmount": SetComboBoxByValue(cmbDofBlurAmount, value); break;
                     case "filteringOverride": SetComboBoxByValue(cmbFilteringOverride, value); break;
+                    case "sharpenStrength": SetSliderByValue(sldSharpenStrength, value); break;
                     case "unlockFPS": chkUnlockFPS.IsChecked = value == "1"; break;
                     case "FPSlimit": txtFpsLimit.Text = value; break;
                     case "FPSthreshold": txtFpsThreshold.Text = value; break;
@@ -637,6 +749,8 @@ namespace DDTM_DSFixUI
                     case "borderlessFullscreen": chkBorderless.IsChecked = value == "1"; break;
                     case "disableCursor": chkDisableCursor.IsChecked = value == "1"; break;
                     case "captureCursor": chkCaptureCursor.IsChecked = value == "1"; break;
+                    case "enableVsync": SetVsyncValue(value); break;
+                    case "fullscreenHz": txtFullscreenHz.Text = value; break;
 
                     case "enableBackups": chkEnableBackups.IsChecked = value == "1"; break;
                     case "backupInterval": txtBackupInterval.Text = value; break;
@@ -680,6 +794,7 @@ namespace DDTM_DSFixUI
                                 case "toggle30FPSLimit": txtKeyToggle30FPSLimit.Text = vkKey; chkKeyToggle30FPSLimit.IsChecked = isChecked; break;
                                 case "reloadSSAOEffect": txtKeyReloadSSAO.Text = vkKey; chkKeyReloadSSAO.IsChecked = isChecked; break;
                                 case "togglePaused": txtKeyTogglePaused.Text = vkKey; chkKeyTogglePaused.IsChecked = isChecked; break;
+                                case "toggleSharpen": txtKeyToggleSharpen.Text = vkKey; chkKeyToggleSharpen.IsChecked = isChecked; break;
                             }
                         }
                         break;
@@ -730,6 +845,7 @@ namespace DDTM_DSFixUI
                     case "disableDofScaling": lines[i] = $"disableDofScaling {(chkDisableDofScaling.IsChecked == true ? "1" : "0")}"; break;
                     case "dofBlurAmount": lines[i] = $"dofBlurAmount {GetComboBoxValue(cmbDofBlurAmount)}"; break;
                     case "filteringOverride": lines[i] = $"filteringOverride {GetComboBoxValue(cmbFilteringOverride)}"; break;
+                    case "sharpenStrength": lines[i] = $"sharpenStrength {GetSliderValue(sldSharpenStrength)}"; break;
                     case "unlockFPS": lines[i] = $"unlockFPS {(chkUnlockFPS.IsChecked == true ? "1" : "0")}"; break;
                     case "FPSlimit": lines[i] = $"FPSlimit {txtFpsLimit.Text}"; break;
                     case "FPSthreshold": lines[i] = $"FPSthreshold {txtFpsThreshold.Text}"; break;
@@ -750,6 +866,8 @@ namespace DDTM_DSFixUI
                     case "borderlessFullscreen": lines[i] = $"borderlessFullscreen {(chkBorderless.IsChecked == true ? "1" : "0")}"; break;
                     case "disableCursor": lines[i] = $"disableCursor {(chkDisableCursor.IsChecked == true ? "1" : "0")}"; break;
                     case "captureCursor": lines[i] = $"captureCursor {(chkCaptureCursor.IsChecked == true ? "1" : "0")}"; break;
+                    case "enableVsync": lines[i] = $"enableVsync {GetVsyncValue()}"; break;
+                    case "fullscreenHz": lines[i] = $"fullscreenHz {GetFullscreenHzValue()}"; break;
 
                     case "enableBackups": lines[i] = $"enableBackups {(chkEnableBackups.IsChecked == true ? "1" : "0")}"; break;
                     case "backupInterval": lines[i] = $"backupInterval {txtBackupInterval.Text}"; break;
@@ -798,6 +916,17 @@ namespace DDTM_DSFixUI
                 bool exists = withNew.Any(l => l.TrimStart().Split(new[] { ' ', '\t' }, 2)[0] == key);
                 if (!exists) withNew.Add($"{key} {(check.IsChecked == true ? "1" : "0")}");
             }
+            var newerValues = new (string Key, string Value)[]
+            {
+                ("sharpenStrength", GetSliderValue(sldSharpenStrength)),
+                ("enableVsync", GetVsyncValue()),
+                ("fullscreenHz", GetFullscreenHzValue())
+            };
+            foreach (var (key, val) in newerValues)
+            {
+                bool exists = withNew.Any(l => l.TrimStart().Split(new[] { ' ', '\t' }, 2)[0] == key);
+                if (!exists) withNew.Add($"{key} {val}");
+            }
             lines = withNew.ToArray();
             File.WriteAllLines(dsfixPath, lines);
 
@@ -817,7 +946,8 @@ namespace DDTM_DSFixUI
                     { "toggleDofGauss", (txtKeyToggleDofGauss.Text, chkKeyToggleDofGauss.IsChecked == true) },
                     { "toggle30FPSLimit", (txtKeyToggle30FPSLimit.Text, chkKeyToggle30FPSLimit.IsChecked == true) },
                     { "reloadSSAOEffect", (txtKeyReloadSSAO.Text, chkKeyReloadSSAO.IsChecked == true) },
-                    { "togglePaused", (txtKeyTogglePaused.Text, chkKeyTogglePaused.IsChecked == true) }
+                    { "togglePaused", (txtKeyTogglePaused.Text, chkKeyTogglePaused.IsChecked == true) },
+                    { "toggleSharpen", (txtKeyToggleSharpen.Text, chkKeyToggleSharpen.IsChecked == true) }
                 };
 
                 string[] keysLines = File.ReadAllLines(dsfixKeysPath);
@@ -1002,6 +1132,7 @@ namespace DDTM_DSFixUI
                 txtKeyToggle30FPSLimit.Text = "VK_BACK";
                 txtKeyReloadSSAO.Text = "VK_NUMPAD5";
                 txtKeyTogglePaused.Text = "VK_F9";
+                txtKeyToggleSharpen.Text = "VK_F4";
                 ValidateAllControls();
             }
         }
