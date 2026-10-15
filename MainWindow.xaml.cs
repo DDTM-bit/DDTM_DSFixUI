@@ -393,7 +393,7 @@ namespace DDTM_DSFixUI
                 chkEnableShaderDumping.IsChecked = false;
                 chkEnableShaderOverride.IsChecked = false;
                 cmbPresentResolution.Text = "0x0";
-                cmbFilteringOverride.SelectedIndex = 2;
+                cmbFilteringOverride.SelectedIndex = 0;
                 chkEnableHudMod.IsChecked = false;
                 chkCaptureCursor.IsChecked = false;
                 cmbOverrideLanguage.SelectedIndex = 0;
@@ -440,20 +440,20 @@ namespace DDTM_DSFixUI
                 else if (screenWidth == 1920) // 1920x1080
                 {
                     cmbRenderResolution.Text = "1920x1080";
-                    cmbDofOverrideResolution.Text = "540";
-                    cmbDofBlurAmount.SelectedIndex = 0; // 1 or 2
+                    cmbDofOverrideResolution.Text = "810";
+                    cmbDofBlurAmount.SelectedIndex = 1; // 1 or 2
                 }
                 else if (screenWidth == 2560) // 2560x1440
                 {
                     cmbRenderResolution.Text = "2560x1440";
-                    cmbDofOverrideResolution.Text = "810";
+                    cmbDofOverrideResolution.Text = "1080";
                     cmbDofBlurAmount.SelectedIndex = 1; // 1 or 2
                 }
                 else if (screenWidth >= 3840) // 3840x2160
                 {
                     cmbRenderResolution.Text = "3840x2160";
                     cmbDofOverrideResolution.Text = "1080";
-                    cmbDofBlurAmount.SelectedIndex = 2; // 3 or 4
+                    cmbDofBlurAmount.SelectedIndex = 1; // 3 or 4
                 }
                 else // any other resolution: 16:10, Steam Deck, ultrawide, etc.
                 {
@@ -463,12 +463,12 @@ namespace DDTM_DSFixUI
                     // Render resolution = desktop resolution
                     cmbRenderResolution.Text = $"{w}x{h}";
 
-                    // DoF override: smallest allowed value that is >= half the height and < the height
+                    // DoF override: smallest allowed value that is > half the height and < the height
                     int[] allowedDof = { 0, 540, 810, 1080, 2160 };
                     int dof = 0;
                     foreach (int candidate in allowedDof)
                     {
-                        if (candidate >= h / 2.0 && candidate < h)
+                        if (candidate > h / 2.0 && candidate < h)
                         {
                             dof = candidate;
                             break; // list is ascending, so this is the closest to half
@@ -480,8 +480,8 @@ namespace DDTM_DSFixUI
                     cmbDofBlurAmount.SelectedIndex = dof switch
                     {
                         810 => 1,
-                        1080 => 2,
-                        2160 => 3,
+                        1080 => 1,
+                        2160 => 2,
                         _ => 0   // 0 or 540
                     };
                 }
@@ -1171,6 +1171,74 @@ namespace DDTM_DSFixUI
                 txtScreenshotDir.Text = dialog.FolderName; // Atenție, se folosește FolderName, nu FileName
                 ValidateAllControls();
             }
+        }
+
+        private void BrowseDinput8Wrapper_Click(object sender, RoutedEventArgs e)
+        {
+            string appDir = AppDomain.CurrentDomain.BaseDirectory;
+
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Title = "Select the dinput8.dll wrapper to chain (e.g. DDTMControllerFix.dll)",
+                Filter = "DLL files (*.dll)|*.dll",
+                InitialDirectory = appDir,
+                CheckFileExists = true,
+                Multiselect = false
+            };
+            if (dialog.ShowDialog(this) != true) return;
+
+            string fileName = System.IO.Path.GetFileName(dialog.FileName);
+
+            // DSfix itself is dinput8.dll, so it cannot be chained to itself
+            if (fileName.Equals("dinput8.dll", StringComparison.OrdinalIgnoreCase))
+            {
+                MessageBox.Show("dinput8.dll is DSfix itself and cannot be used as the wrapper.\nSelect the other dll you want to chain (e.g. DDTMControllerFix.dll).",
+                                "dinput8.dll Wrapper", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            string dllFolder = System.IO.Path.GetFullPath(System.IO.Path.GetDirectoryName(dialog.FileName)).TrimEnd('\\');
+            string gameFolder = System.IO.Path.GetFullPath(appDir).TrimEnd('\\');
+
+            if (string.Equals(dllFolder, gameFolder, StringComparison.OrdinalIgnoreCase))
+            {
+                // in the game folder: store just the file name, as DSfix expects
+                txtDinput8dllWrapper.Text = fileName;
+            }
+            else
+            {
+                string target = System.IO.Path.Combine(appDir, fileName);
+                string replaceNote = File.Exists(target) ? "\n(The file with the same name in the game folder will be replaced.)" : "";
+
+                var answer = MessageBox.Show(
+                    $"{fileName} is not in the game folder.\n\n" +
+                    "Yes = copy it into the game folder and use it (recommended)" + replaceNote + "\n" +
+                    "No = use it from where it is (full path)\n" +
+                    "Cancel = do nothing",
+                    "dinput8.dll Wrapper", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+
+                if (answer == MessageBoxResult.Cancel) return;
+
+                if (answer == MessageBoxResult.Yes)
+                {
+                    try
+                    {
+                        File.Copy(dialog.FileName, target, overwrite: true);
+                        txtDinput8dllWrapper.Text = fileName;
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Could not copy the dll:\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+                }
+                else
+                {
+                    txtDinput8dllWrapper.Text = dialog.FileName;
+                }
+            }
+
+            ValidateAllControls();   // blue-violet if it differs from DSfix.ini
         }
 
         private void BtnExit_Click(object sender, RoutedEventArgs e)
