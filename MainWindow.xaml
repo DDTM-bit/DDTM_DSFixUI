@@ -417,10 +417,20 @@
                     </WrapPanel>
                     <Separator Height="6" Background="#FF736554" Margin="0,15,0,0"/>
                     <!-- Controller Button Prompt Swap -->
-                    <TextBlock Text="Controller Button Prompt Swap" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,15,0,5"/>
+                    <TextBlock Text="Controller Button Prompt Swap (Only the Icons In-game)" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,15,0,5"/>
                     <CheckBox Name="chkSwapConfirmIcons" Content="Swap confirm icons (cross / circle - A / B)" Foreground="White" Margin="0,5,0,0" ToolTip="In-game swap cross and circle (A and B) button icons."/>
-                    <CheckBox Name="chkSwapXYIcons" Content="Swap X / Y icons (square / triangle - X / Y)" Foreground="White" Margin="0,5,0,0" ToolTip="In-game swap square and triangle (X and Y) button icons."/>
-                    <TextBlock Text="These are also set automatically when you save swapped A/B or X/Y mappings in the DDTM Controller tab." Foreground="#FF7F7F7F" FontStyle="Italic" FontSize="12" TextWrapping="Wrap" Margin="0,6,0,0"/>
+                    <CheckBox Name="chkSwapXYIcons" Content="Swap X / Y icons (square / triangle - X / Y)" Foreground="White" Margin="0,5,0,0" ToolTip="In-game swap square and triangle (X and Y) button icons." Height="35"/>
+                    <WrapPanel Margin="0,10,0,0">
+                        <Label Content="DSfix 3.0 In-Game Controller icons:" Width="240"/>
+                        <ComboBox Name="cmbControllerIcons" Width="120" ToolTip="Controller button icons (button prompts and quick menu), built into DSfix3">
+                            <ComboBoxItem Content="off"/>
+                            <ComboBoxItem Content="auto"/>
+                            <ComboBoxItem Content="xbox"/>
+                            <ComboBoxItem Content="playstation"/>
+                            <ComboBoxItem Content="switch"/>
+                        </ComboBox>
+                    </WrapPanel>
+                    
                 </StackPanel>
             </TabItem>
             <!-- 7. KEYS -->

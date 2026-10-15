@@ -409,8 +409,8 @@ namespace DDTM_DSFixUI
             SnapshotCurrentValues(tabController);
             ShowControllerSaved();
 
-            // keep the in-game A/B and X/Y button icons in line with the mapping (DSfix.ini)
-            SyncPromptIconsWithMapping();
+            // offer to keep the in-game A/B and X/Y button icons in line with the mapping (DSfix.ini)
+            AskSyncPromptIconsWithMapping();
         }
 
         // Builds the full .ini text from the 4 sub tabs, using 'template' (an existing file's lines)

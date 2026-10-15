@@ -5,7 +5,7 @@ using System.Windows.Controls;
 namespace DDTM_DSFixUI
 {
     // DDTM Controller tab extras:
-    //  - keeps DSfix.ini swapConfirmIcons / swapXYIcons in line with the button mapping
+    //  - offers to keep DSfix.ini swapConfirmIcons / swapXYIcons in line with the button mapping
     //  - Save Profile / Load Profile
     public partial class MainWindow
     {
@@ -33,7 +33,70 @@ namespace DDTM_DSFixUI
             return IsOneOf(x, "TRIANGLE", "Y", "NORTH") && IsOneOf(y, "SQUARE", "X", "WEST");
         }
 
-        // Called after the controller .ini was written successfully
+        // Called after the controller .ini was written successfully.
+        // Asks the user first; DSfix.ini is only changed when the answer is Yes.
+        private void AskSyncPromptIconsWithMapping()
+        {
+            if (!File.Exists(dsfixPath)) return;
+
+            bool abSwapped = IsConfirmSwapped();
+            bool xySwapped = IsXYSwapped();
+            string wantAb = abSwapped ? "1" : "0";
+            string wantXy = xySwapped ? "1" : "0";
+
+            Dictionary<string, string> current;
+            try
+            {
+                current = ReadDsfixValues("swapConfirmIcons", "swapXYIcons");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Could not read DSfix.ini:\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            // a missing key counts as 0 (icons not swapped)
+            string curAb = current.TryGetValue("swapConfirmIcons", out string a) ? a : "0";
+            string curXy = current.TryGetValue("swapXYIcons", out string x) ? x : "0";
+
+            var changes = new List<string>();
+            if (curAb != wantAb)
+                changes.Add(abSwapped ? "- swap the A/B (cross / circle) button icons in game (swapConfirmIcons 1)"
+                                      : "- set the A/B (cross / circle) button icons back to normal (swapConfirmIcons 0)");
+            if (curXy != wantXy)
+                changes.Add(xySwapped ? "- swap the X/Y (square / triangle) button icons in game (swapXYIcons 1)"
+                                      : "- set the X/Y (square / triangle) button icons back to normal (swapXYIcons 0)");
+
+            if (changes.Count == 0) return;   // DSfix.ini already matches the mapping: nothing to ask
+
+            var answer = MessageBox.Show(
+                "Controller settings saved.\n\n" +
+                "To match your button mapping, the in-game button icons can be updated in Miscellaneous tab:\n\n" +
+                string.Join("\n", changes) +
+                "\n\nDo you want to update DSfix.ini now?",
+                "In-game button icons", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (answer == MessageBoxResult.Yes)
+                SyncPromptIconsWithMapping();
+        }
+
+        // Reads "key value" lines from DSfix.ini (only active, not commented lines)
+        private Dictionary<string, string> ReadDsfixValues(params string[] keys)
+        {
+            var result = new Dictionary<string, string>();
+            foreach (string line in File.ReadAllLines(dsfixPath))
+            {
+                string t = line.Trim();
+                if (t.Length == 0 || t.StartsWith("#")) continue;
+
+                string[] parts = t.Split(new[] { ' ', '\t' }, 2, StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length == 0 || !keys.Contains(parts[0]) || result.ContainsKey(parts[0])) continue;
+                result[parts[0]] = parts.Length > 1 ? parts[1].Trim() : "";
+            }
+            return result;
+        }
+
+        // Writes swapConfirmIcons / swapXYIcons to DSfix.ini (called after the user said Yes)
         private void SyncPromptIconsWithMapping()
         {
             bool abSwapped = IsConfirmSwapped();

@@ -322,6 +322,7 @@ namespace DDTM_DSFixUI
                     case "logLevel": SetComboBoxByValue(cmbLogLevel, value); break;
                     case "swapConfirmIcons": chkSwapConfirmIcons.IsChecked = value == "1"; break;
                     case "swapXYIcons": chkSwapXYIcons.IsChecked = value == "1"; break;
+                    case "controllerIcons": if (value.Length > 0) SetComboBoxByValue(cmbControllerIcons, value.ToLowerInvariant()); break;
                 }
             }
             SetComboBoxByValue(cmbRenderResolution, $"{rW}x{rH}");
@@ -667,6 +668,7 @@ namespace DDTM_DSFixUI
                 $"logLevel={GetComboBoxValue(cmbLogLevel)}",
                 $"swapConfirmIcons={(chkSwapConfirmIcons.IsChecked == true ? "1" : "0")}",
                 $"swapXYIcons={(chkSwapXYIcons.IsChecked == true ? "1" : "0")}",
+                $"controllerIcons={GetComboBoxValue(cmbControllerIcons)}",
 
                 // Keys mappings
                 $"toggleCursorCapture={txtKeyToggleCursorCapture.Text}|{chkKeyToggleCursorCapture.IsChecked}",
@@ -771,6 +773,7 @@ namespace DDTM_DSFixUI
                     case "logLevel": SetComboBoxByValue(cmbLogLevel, value); break;
                     case "swapConfirmIcons": chkSwapConfirmIcons.IsChecked = value == "1"; break;
                     case "swapXYIcons": chkSwapXYIcons.IsChecked = value == "1"; break;
+                    case "controllerIcons": if (value.Length > 0) SetComboBoxByValue(cmbControllerIcons, value.ToLowerInvariant()); break;
 
                     default:
                         // Handle Keys formatted as "Action=Key|IsChecked"
@@ -888,6 +891,7 @@ namespace DDTM_DSFixUI
                     case "logLevel": lines[i] = $"logLevel {GetComboBoxValue(cmbLogLevel)}"; break;
                     case "swapConfirmIcons": lines[i] = $"swapConfirmIcons {(chkSwapConfirmIcons.IsChecked == true ? "1" : "0")}"; break;
                     case "swapXYIcons": lines[i] = $"swapXYIcons {(chkSwapXYIcons.IsChecked == true ? "1" : "0")}"; break;
+                    case "controllerIcons": if (cmbControllerIcons.SelectedItem != null) lines[i] = $"controllerIcons {GetComboBoxValue(cmbControllerIcons)}"; break;   // never appended: older DSfix.ini files do not have it
                 }
             }
             // Newer settings: append them if the .ini does not contain them yet
