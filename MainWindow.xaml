@@ -430,6 +430,11 @@
                             <ComboBoxItem Content="switch"/>
                         </ComboBox>
                     </WrapPanel>
+                    <Separator Height="6" Background="#FF736554" Margin="0,15,0,0"/>
+                    <!-- Items & HUD -->
+                    <TextBlock Text="QoL: Items &amp; HUD" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,15,0,5"/>
+                    <CheckBox Name="chkDisableItemAutoEquip" Content="Disable item auto-equip (Estus unchanged)" Foreground="White" Margin="0,5,0,0" ToolTip="Consumables you pick up are no longer put into your quick item slots automatically (Estus unchanged)."/>
+                    <CheckBox Name="chkDurabilityBars" Content="Show weapon durability bars (Dark Souls III Style)" Foreground="White" Margin="0,5,0,0" ToolTip="Thin bar under each weapon slot showing durability left (bottom-left HUD)."/>
                     
                 </StackPanel>
             </TabItem>

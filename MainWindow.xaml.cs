@@ -396,6 +396,8 @@ namespace DDTM_DSFixUI
                     case "logLevel": SetComboBoxByValue(cmbLogLevel, value); break;
                     case "swapConfirmIcons": chkSwapConfirmIcons.IsChecked = value == "1"; break;
                     case "swapXYIcons": chkSwapXYIcons.IsChecked = value == "1"; break;
+                    case "disableItemAutoEquip": chkDisableItemAutoEquip.IsChecked = value == "1"; break;
+                    case "durabilityBars": chkDurabilityBars.IsChecked = value == "1"; break;
                     case "controllerIcons": if (value.Length > 0) SetComboBoxByValue(cmbControllerIcons, value.ToLowerInvariant()); break;
                 }
             }
@@ -746,6 +748,8 @@ namespace DDTM_DSFixUI
                 $"swapConfirmIcons={(chkSwapConfirmIcons.IsChecked == true ? "1" : "0")}",
                 $"swapXYIcons={(chkSwapXYIcons.IsChecked == true ? "1" : "0")}",
                 $"controllerIcons={GetComboBoxValue(cmbControllerIcons)}",
+                $"disableItemAutoEquip={(chkDisableItemAutoEquip.IsChecked == true ? "1" : "0")}",
+                $"durabilityBars={(chkDurabilityBars.IsChecked == true ? "1" : "0")}",
 
                 // Keys mappings
                 $"toggleCursorCapture={txtKeyToggleCursorCapture.Text}|{chkKeyToggleCursorCapture.IsChecked}",
@@ -850,6 +854,8 @@ namespace DDTM_DSFixUI
                     case "logLevel": SetComboBoxByValue(cmbLogLevel, value); break;
                     case "swapConfirmIcons": chkSwapConfirmIcons.IsChecked = value == "1"; break;
                     case "swapXYIcons": chkSwapXYIcons.IsChecked = value == "1"; break;
+                    case "disableItemAutoEquip": chkDisableItemAutoEquip.IsChecked = value == "1"; break;
+                    case "durabilityBars": chkDurabilityBars.IsChecked = value == "1"; break;
                     case "controllerIcons": if (value.Length > 0) SetComboBoxByValue(cmbControllerIcons, value.ToLowerInvariant()); break;
 
                     default:
@@ -970,6 +976,8 @@ namespace DDTM_DSFixUI
                     case "logLevel": lines[i] = $"logLevel {GetComboBoxValue(cmbLogLevel)}"; break;
                     case "swapConfirmIcons": lines[i] = $"swapConfirmIcons {(chkSwapConfirmIcons.IsChecked == true ? "1" : "0")}"; break;
                     case "swapXYIcons": lines[i] = $"swapXYIcons {(chkSwapXYIcons.IsChecked == true ? "1" : "0")}"; break;
+                    case "disableItemAutoEquip": lines[i] = $"disableItemAutoEquip {(chkDisableItemAutoEquip.IsChecked == true ? "1" : "0")}"; break;   // never appended
+                    case "durabilityBars": lines[i] = $"durabilityBars {(chkDurabilityBars.IsChecked == true ? "1" : "0")}"; break;               // never appended
                     case "controllerIcons": if (cmbControllerIcons.SelectedItem != null) lines[i] = $"controllerIcons {GetComboBoxValue(cmbControllerIcons)}"; break;   // never appended: older DSfix.ini files do not have it
                 }
             }
