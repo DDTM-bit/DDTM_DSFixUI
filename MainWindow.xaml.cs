@@ -63,49 +63,123 @@ namespace DDTM_DSFixUI
             LoadDSFixIni();
         }
 
+        // ---- Resolutions, grouped by aspect ratio ----
+        private static readonly (int W, int H)[] StandardResolutions =
+        {
+            (640, 480), (800, 600), (1024, 768), (1280, 1024),
+            (1280, 720), (1366, 768), (1600, 900), (1920, 1080), (2560, 1440), (3840, 2160),
+            (1280, 800), (1440, 900), (1680, 1050), (1920, 1200), (2560, 1600), (3840, 2400),   // 1280x800 is the Steam Deck
+            (2560, 1080), (3440, 1440), (3840, 1600),
+            (3840, 1080), (5120, 1440)
+        };
+
+        // Header text + the exact ratio of each group, in the order they are shown
+        private static readonly (string Header, double Ratio)[] AspectGroups =
+        {
+            ("4:3", 4.0 / 3.0),
+            ("5:4", 5.0 / 4.0),
+            ("16:9", 16.0 / 9.0),
+            ("16:10", 16.0 / 10.0),
+            ("21:9 Ultrawide", 21.0 / 9.0),
+            ("32:9 Super ultrawide", 32.0 / 9.0)
+        };
+        private const string OtherAspectGroup = "Other";
+
+        // 1366x768 or 3440x1440 are not exact ratios, so allow a small tolerance
+        private static string AspectGroupOf(int w, int h)
+        {
+            double r = (double)w / h;
+            foreach (var g in AspectGroups)
+                if (Math.Abs(r - g.Ratio) / g.Ratio < 0.035) return g.Header;
+            return OtherAspectGroup;
+        }
+
+        private static int AspectGroupOrder(string header)
+        {
+            int i = Array.FindIndex(AspectGroups, g => g.Header == header);
+            return i >= 0 ? i : AspectGroups.Length;   // "Other" goes last
+        }
+
         private void PopulateResolutions()
         {
-            var resolutions = new[] {
-        // 4:3 / 5:4
-        (640, 480), (800, 600), (1024, 768), (1280, 1024),
-        // 16:9
-        (1280, 720), (1366, 768), (1600, 900), (1920, 1080), (2560, 1440), (3840, 2160),
-        // 16:10 (1280x800 is the Steam Deck)
-        (1280, 800), (1440, 900), (1680, 1050), (1920, 1200), (2560, 1600), (3840, 2400),
-        // Ultrawide 21:9
-        (2560, 1080), (3440, 1440), (3840, 1600),
-        // Super ultrawide 32:9
-        (3840, 1080), (5120, 1440)
-    };
-
-            // Sort by total pixels so the list reads from small to large
-            var sorted = resolutions.OrderBy(r => r.Item1 * r.Item2).ThenBy(r => r.Item1).ToList();
-
-            cmbPresentResolution.Items.Add(new System.Windows.Controls.ComboBoxItem { Content = "0x0" });
-
-            // Keep the native resolution selectable even if it isn't in the list (inserted in sorted order)
+            // Keep the native resolution selectable even if it isn't in the standard list
             int nativeW = (int)screenWidth, nativeH = (int)screenHeight;
-            if (!sorted.Any(r => r.Item1 == nativeW && r.Item2 == nativeH))
+            var list = StandardResolutions.ToList();
+            if (!list.Contains((nativeW, nativeH))) list.Add((nativeW, nativeH));
+
+            FillResolutionCombo(cmbRenderResolution, list);
+            FillResolutionCombo(cmbPresentResolution, list);
+
+            SetComboBoxByValue(cmbRenderResolution, $"{nativeW}x{nativeH}");   // default = display resolution
+            SetComboBoxByValue(cmbPresentResolution, "0x0");                    // default = no downscaling
+        }
+
+        // Rebuilds a resolution combo: a non-selectable header per aspect ratio, resolutions sorted small to large
+        private void FillResolutionCombo(System.Windows.Controls.ComboBox cmb, IEnumerable<(int W, int H)> resolutions)
+        {
+            cmb.Items.Clear();
+
+            if (ReferenceEquals(cmb, cmbPresentResolution))
             {
-                sorted.Add((nativeW, nativeH));
-                sorted = sorted.OrderBy(r => r.Item1 * r.Item2).ThenBy(r => r.Item1).ToList();
+                cmb.Items.Add(MakeResolutionHeader("No downscaling"));
+                cmb.Items.Add(MakeResolutionItem("0x0"));
             }
-            string native = $"{nativeW}x{nativeH}";
 
-            foreach (var res in sorted)
+            var groups = resolutions
+                .Where(r => r.W > 0 && r.H > 0)
+                .Distinct()
+                .GroupBy(r => AspectGroupOf(r.W, r.H))
+                .OrderBy(g => AspectGroupOrder(g.Key));
+
+            foreach (var group in groups)
             {
-                string resString = $"{res.Item1}x{res.Item2}";
-
-                // Present (downscaling): all resolutions
-                cmbPresentResolution.Items.Add(new System.Windows.Controls.ComboBoxItem { Content = resString });
-
-                // Render: all resolutions (no limit to the display resolution)
-                var renderItem = new System.Windows.Controls.ComboBoxItem { Content = resString };
-                cmbRenderResolution.Items.Add(renderItem);
-                if (resString == native) cmbRenderResolution.SelectedItem = renderItem;   // default = display resolution
+                cmb.Items.Add(MakeResolutionHeader(group.Key));
+                foreach (var r in group.OrderBy(r => r.W * r.H).ThenBy(r => r.W))
+                    cmb.Items.Add(MakeResolutionItem($"{r.W}x{r.H}"));
             }
+        }
 
-            cmbPresentResolution.SelectedIndex = 0;
+        private static System.Windows.Controls.ComboBoxItem MakeResolutionHeader(string text)
+        {
+            return new System.Windows.Controls.ComboBoxItem
+            {
+                Content = text,
+                IsEnabled = false,      // header, not selectable
+                Focusable = false,
+                FontWeight = FontWeights.Bold,
+                Foreground = Brushes.Black,
+                Background = new SolidColorBrush(Color.FromRgb(0xFF, 0x8C, 0x00)),
+                Padding = new Thickness(6, 3, 6, 3)
+            };
+        }
+
+        private static System.Windows.Controls.ComboBoxItem MakeResolutionItem(string text)
+        {
+            return new System.Windows.Controls.ComboBoxItem { Content = text, Padding = new Thickness(18, 3, 6, 3) };
+        }
+
+        // A resolution read from an .ini that is not in the list is added to its aspect-ratio group,
+        // so it can be selected (instead of silently keeping another value)
+        private void EnsureResolutionInList(System.Windows.Controls.ComboBox cmb, string w, string h)
+        {
+            if (!int.TryParse(w, out int iw) || !int.TryParse(h, out int ih) || iw <= 0 || ih <= 0) return;
+
+            var list = new List<(int W, int H)>();
+            foreach (var o in cmb.Items)
+            {
+                if (o is System.Windows.Controls.ComboBoxItem it && it.IsEnabled && it.Content is string s)
+                {
+                    string[] parts = s.Split('x');
+                    if (parts.Length == 2 && int.TryParse(parts[0], out int a) && int.TryParse(parts[1], out int b) && a > 0 && b > 0)
+                        list.Add((a, b));
+                }
+            }
+            if (list.Contains((iw, ih))) return;
+
+            string selected = (cmb.SelectedItem as System.Windows.Controls.ComboBoxItem)?.Content as string;
+            list.Add((iw, ih));
+            FillResolutionCombo(cmb, list);
+            if (selected != null) SetComboBoxByValue(cmb, selected);
         }
 
         private void NumericOnly_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
@@ -203,7 +277,7 @@ namespace DDTM_DSFixUI
             {
                 string trimmedLine = lines[i].Trim();
 
-                
+
                 if (trimmedLine.StartsWith("["))
                 {
                     inDisplaySettingWindow = (trimmedLine == "[DisplaySettingWindow]");
@@ -218,7 +292,7 @@ namespace DDTM_DSFixUI
                 else if (trimmedLine.StartsWith("Antialiasing")) lines[i] = "Antialiasing = 0";
                 else if (trimmedLine.StartsWith("Blur")) lines[i] = "Blur = 0";
 
-                
+
                 if (inDisplaySettingWindow)
                 {
                     if (trimmedLine.StartsWith("Width")) lines[i] = $"Width = {screenWidth}";
@@ -325,6 +399,8 @@ namespace DDTM_DSFixUI
                     case "controllerIcons": if (value.Length > 0) SetComboBoxByValue(cmbControllerIcons, value.ToLowerInvariant()); break;
                 }
             }
+            EnsureResolutionInList(cmbRenderResolution, rW, rH);
+            EnsureResolutionInList(cmbPresentResolution, pW, pH);
             SetComboBoxByValue(cmbRenderResolution, $"{rW}x{rH}");
             SetComboBoxByValue(cmbPresentResolution, $"{pW}x{pH}");
 
@@ -409,7 +485,7 @@ namespace DDTM_DSFixUI
                     txtDinput8dllWrapper.Text = "DDTMControllerFix.dll";
                 }
 
-        chkSkipIntro.IsChecked = true;
+                chkSkipIntro.IsChecked = true;
 
                 // DarkSouls.ini: borderless needs the in-game windowed mode
                 EnsureDarkSoulsWindowMode();
@@ -569,6 +645,7 @@ namespace DDTM_DSFixUI
         {
             foreach (System.Windows.Controls.ComboBoxItem item in cmb.Items)
             {
+                if (!item.IsEnabled) continue;   // group headers (resolution lists) are not selectable
                 if (item.Content.ToString().StartsWith(value) || item.Content.ToString() == value)
                 {
                     cmb.SelectedItem = item;
@@ -803,6 +880,8 @@ namespace DDTM_DSFixUI
                         break;
                 }
             }
+            EnsureResolutionInList(cmbRenderResolution, rW, rH);
+            EnsureResolutionInList(cmbPresentResolution, pW, pH);
             SetComboBoxByValue(cmbRenderResolution, $"{rW}x{rH}");
             SetComboBoxByValue(cmbPresentResolution, $"{pW}x{pH}");
             MessageBox.Show("Local configuration loaded.", "Local Load", MessageBoxButton.OK, MessageBoxImage.Information);
