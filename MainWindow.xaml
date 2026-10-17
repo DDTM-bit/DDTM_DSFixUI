@@ -120,7 +120,7 @@
                         <WrapPanel>
                             <CheckBox Name="chkUnlockFPS" Content="Unlock FPS" Foreground="White" Margin="5,5,15,5" IsChecked="True" ToolTip="Enables variable framerate." Unchecked="chkUnlockFPS_Unchecked"/>
                             <Label Content="FPS Limit:"/>
-                            <TextBox Name="txtFpsLimit" Width="50" Text="60" Margin="0,0,15,0" ToolTip="Cap framerate. Maximum recommended is 120." TextChanged="TxtFpsLimit_TextChanged"/>
+                            <TextBox Name="txtFpsLimit" Width="50" Text="60" Margin="0,0,15,0" ToolTip="Cap framerate. Maximum recommended is 144." TextChanged="TxtFpsLimit_TextChanged"/>
                             <Label Content="FPS Threshold:"/>
                             <TextBox Name="txtFpsThreshold" Width="50" Text="20" ToolTip="Dynamically disables AA if framerate drops below this."/>
                         </WrapPanel>
@@ -308,7 +308,7 @@
             <!-- 3. WINDOW & MOUSE -->
             <TabItem Header="Window &amp; Mouse">
                 <StackPanel Margin="10">
-                    <CheckBox Name="chkBorderless" Content="Borderless Fullscreen" Foreground="White" IsChecked="True" ToolTip="Requires windowed mode in-game!"/>
+                    <CheckBox Name="chkBorderless" Content="Borderless Fullscreen  (check this only for the game's Screen Mode set to Windowed)" Foreground="White" IsChecked="True" ToolTip="Requires windowed mode in-game!"/>
                     <CheckBox Name="chkDisableCursor" Content="Disable Cursor at Startup" Foreground="White" IsChecked="True" Margin="0,5,0,0" ToolTip="Disable mouse cursor at startup"/>
                     <CheckBox Name="chkCaptureCursor" Content="Capture Cursor (Lock to window)" Foreground="White" Margin="0,5,0,0" ToolTip="capture cursor (do not allow it to leave the window)"/>
                     <Separator Height="25" Background="#FF736554" Margin="0,15,0,0"/>
@@ -324,6 +324,31 @@
                         <Label Content="Refresh Rate Hz:"/>
                         <TextBox Name="txtFullscreenHz" Width="60" Text="0" VerticalAlignment="Center" ToolTip="Refresh rate in the game's fullscreen mode: 0 = leave the game's choice (default) or a value such as 120, 144, 165, 180. DSfix checks it against the rates your monitor supports and uses the highest one that is not above this value."/>
                     </WrapPanel>
+                    <!-- Info: G-Sync / FreeSync (calm info card, muted colours) -->
+                    <Border Background="#2B2E31" BorderBrush="#4D5A63" BorderThickness="1" CornerRadius="6" Padding="14,10" Margin="0,25,0,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <!-- small "i" badge -->
+                            <Border Width="22" Height="22" CornerRadius="11" Background="#4D6B7A" VerticalAlignment="Top" Margin="0,1,12,0">
+                                <TextBlock Text="i" Foreground="#E8EEF2" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="G-Sync / FreeSync" Foreground="#E0C08A" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                                <TextBlock TextWrapping="Wrap" Foreground="#C8CCD0" LineHeight="20" Text="Dark Souls can only use G-Sync / FreeSync in its own fullscreen mode (not in a window or borderless)."/>
+                                <TextBlock TextWrapping="Wrap" Foreground="#C8CCD0" LineHeight="20" Margin="0,8,0,0">
+                                    <Run Text="With G-Sync / FreeSync:" FontWeight="SemiBold" Foreground="#A8CFA0"/>
+                                    <Run Text="untick Borderless Fullscreen, set the game to fullscreen, VSync on, Refresh Rate = monitor max, FPS limit a few below it."/>
+                                </TextBlock>
+                                <TextBlock TextWrapping="Wrap" Foreground="#C8CCD0" LineHeight="20" Margin="0,6,0,0">
+                                    <Run Text="Without G-Sync / FreeSync:" FontWeight="SemiBold" Foreground="#9CBFD8"/>
+                                    <Run Text="Fullscreen or Borderless both are fine but unlike G-Sync/FreeSync, you must put an FPS limit that divides your refresh rate evenly (e.g. 60 on 60/120/180/240 Hz)."/>
+                                </TextBlock>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
                 </StackPanel>
             </TabItem>
 

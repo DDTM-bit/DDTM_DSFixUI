@@ -203,7 +203,6 @@ namespace DDTM_DSFixUI
             }
 
             string[] lines = File.ReadAllLines(darkSoulsIniPath);
-            bool isWindowed = false;
             bool isWidthCorrect = false;
             bool isHeightCorrect = false;
             bool isWidthFullscreenCorrect = false;
@@ -229,8 +228,6 @@ namespace DDTM_DSFixUI
                 {
                     inDisplaySettingFullscreenWindow = (trimmedLine == "[DisplaySettingFullScreen]");
                 }
-
-                if (trimmedLine == "WindowMode = 1") isWindowed = true;
                 if (trimmedLine == "Antialiasing = 0") isAaOff = true;
                 if (trimmedLine == "Blur = 0") isBlurOff = true;
 
@@ -251,10 +248,9 @@ namespace DDTM_DSFixUI
             bool isResCorrect = isWidthCorrect && isHeightCorrect && isWidthFullscreenCorrect && isHeightFullscreenCorrect;
 
             // Adaugă și isResCorrect în condiția de avertizare
-            if (!isWindowed || !isAaOff || !isBlurOff || !isResCorrect)
+            if (!isAaOff || !isBlurOff || !isResCorrect)
             {
                 string probleme = "";
-                if (!isWindowed) probleme += "- Window Mode not activated (required for Borderless).\n";
                 if (!isResCorrect) probleme += $"- Game resolution setting does not match your display ({screenWidth}x{screenHeight}).\n";
                 if (!isAaOff) probleme += "- In-game Anti-Aliasing is ON (conflict with DSFix).\n";
                 if (!isBlurOff) probleme += "- In-game Motion Blur is ON.\n";
@@ -288,8 +284,7 @@ namespace DDTM_DSFixUI
                 }
 
                 // Setările globale care trebuie modificate
-                if (trimmedLine.StartsWith("WindowMode")) lines[i] = "WindowMode = 1";
-                else if (trimmedLine.StartsWith("Antialiasing")) lines[i] = "Antialiasing = 0";
+                if (trimmedLine.StartsWith("Antialiasing")) lines[i] = "Antialiasing = 0";
                 else if (trimmedLine.StartsWith("Blur")) lines[i] = "Blur = 0";
 
 
@@ -397,7 +392,7 @@ namespace DDTM_DSFixUI
                     case "swapConfirmIcons": chkSwapConfirmIcons.IsChecked = value == "1"; break;
                     case "swapXYIcons": chkSwapXYIcons.IsChecked = value == "1"; break;
                     case "disableItemAutoEquip": chkDisableItemAutoEquip.IsChecked = value == "1"; break;
-                    case "durabilityBars": chkDurabilityBars.IsChecked = value == "1"; break;
+                    case "weaponWearBars": chkDurabilityBars.IsChecked = value == "1"; break;
                     case "controllerIcons": if (value.Length > 0) SetComboBoxByValue(cmbControllerIcons, value.ToLowerInvariant()); break;
                 }
             }
@@ -459,7 +454,6 @@ namespace DDTM_DSFixUI
                 cmbSsaoStrength.SelectedIndex = 2; // Medium
                 cmbSsaoScale.SelectedIndex = 0; //High quality;
                 sldSharpenStrength.Value = 0;
-                chkBorderless.IsChecked = true;
                 chkDisableCursor.IsChecked = true;
                 chkEnableBackups.IsChecked = true;
                 txtBackupInterval.Text = "1400";
@@ -488,10 +482,6 @@ namespace DDTM_DSFixUI
                 }
 
                 chkSkipIntro.IsChecked = true;
-
-                // DarkSouls.ini: borderless needs the in-game windowed mode
-                EnsureDarkSoulsWindowMode();
-
                 if (screenWidth == 1024) // 1024x768
                 {
                     cmbRenderResolution.Text = "1024x768";
@@ -603,46 +593,6 @@ namespace DDTM_DSFixUI
             if (text == null || !System.Text.RegularExpressions.Regex.IsMatch(text, "^[0-9]+$")) e.CancelCommand();
         }
 
-        // Sets WindowMode = 1 in DarkSouls.ini when it is 0 (keeps the file's encoding)
-        private void EnsureDarkSoulsWindowMode()
-        {
-            if (!File.Exists(darkSoulsIniPath)) return;
-            try
-            {
-                System.Text.Encoding encoding;
-                string[] lines;
-                using (var reader = new StreamReader(darkSoulsIniPath, System.Text.Encoding.UTF8, detectEncodingFromByteOrderMarks: true))
-                {
-                    var list = new List<string>();
-                    string line;
-                    while ((line = reader.ReadLine()) != null) list.Add(line);
-                    lines = list.ToArray();
-                    encoding = reader.CurrentEncoding;
-                }
-
-                bool changed = false;
-                for (int i = 0; i < lines.Length; i++)
-                {
-                    if (System.Text.RegularExpressions.Regex.IsMatch(lines[i].Trim(), @"^WindowMode\s*=\s*0$"))
-                    {
-                        lines[i] = "WindowMode = 1";
-                        changed = true;
-                    }
-                }
-
-                if (changed)
-                {
-                    File.WriteAllLines(darkSoulsIniPath, lines, encoding);
-                    MessageBox.Show("DarkSouls.ini: in-game Window Mode was OFF and has been set to ON (WindowMode = 1), as needed for borderless fullscreen.",
-                                    "DarkSouls.ini updated", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Could not update DarkSouls.ini:\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
         private void SetComboBoxByValue(System.Windows.Controls.ComboBox cmb, string value)
         {
             foreach (System.Windows.Controls.ComboBoxItem item in cmb.Items)
@@ -749,7 +699,7 @@ namespace DDTM_DSFixUI
                 $"swapXYIcons={(chkSwapXYIcons.IsChecked == true ? "1" : "0")}",
                 $"controllerIcons={GetComboBoxValue(cmbControllerIcons)}",
                 $"disableItemAutoEquip={(chkDisableItemAutoEquip.IsChecked == true ? "1" : "0")}",
-                $"durabilityBars={(chkDurabilityBars.IsChecked == true ? "1" : "0")}",
+                $"weaponWearBars={(chkDurabilityBars.IsChecked == true ? "1" : "0")}",
 
                 // Keys mappings
                 $"toggleCursorCapture={txtKeyToggleCursorCapture.Text}|{chkKeyToggleCursorCapture.IsChecked}",
@@ -855,7 +805,7 @@ namespace DDTM_DSFixUI
                     case "swapConfirmIcons": chkSwapConfirmIcons.IsChecked = value == "1"; break;
                     case "swapXYIcons": chkSwapXYIcons.IsChecked = value == "1"; break;
                     case "disableItemAutoEquip": chkDisableItemAutoEquip.IsChecked = value == "1"; break;
-                    case "durabilityBars": chkDurabilityBars.IsChecked = value == "1"; break;
+                    case "weaponWearBars": case "durabilityBars": chkDurabilityBars.IsChecked = value == "1"; break;
                     case "controllerIcons": if (value.Length > 0) SetComboBoxByValue(cmbControllerIcons, value.ToLowerInvariant()); break;
 
                     default:
@@ -977,7 +927,7 @@ namespace DDTM_DSFixUI
                     case "swapConfirmIcons": lines[i] = $"swapConfirmIcons {(chkSwapConfirmIcons.IsChecked == true ? "1" : "0")}"; break;
                     case "swapXYIcons": lines[i] = $"swapXYIcons {(chkSwapXYIcons.IsChecked == true ? "1" : "0")}"; break;
                     case "disableItemAutoEquip": lines[i] = $"disableItemAutoEquip {(chkDisableItemAutoEquip.IsChecked == true ? "1" : "0")}"; break;   // never appended
-                    case "durabilityBars": lines[i] = $"durabilityBars {(chkDurabilityBars.IsChecked == true ? "1" : "0")}"; break;               // never appended
+                    case "weaponWearBars": lines[i] = $"weaponWearBars {(chkDurabilityBars.IsChecked == true ? "1" : "0")}"; break;               // never appended
                     case "controllerIcons": if (cmbControllerIcons.SelectedItem != null) lines[i] = $"controllerIcons {GetComboBoxValue(cmbControllerIcons)}"; break;   // never appended: older DSfix.ini files do not have it
                 }
             }
@@ -1127,9 +1077,9 @@ namespace DDTM_DSFixUI
 
             if (int.TryParse(txtFpsLimit.Text, out int value))
             {
-                if (value > 120)
+                if (value > 144)
                 {
-                    txtFpsLimit.Text = "120";
+                    txtFpsLimit.Text = "144";
                     txtFpsLimit.CaretIndex = txtFpsLimit.Text.Length;
                 }
                 else if (value < 1)
@@ -1146,9 +1096,9 @@ namespace DDTM_DSFixUI
 
             if (int.TryParse(txtFpsThreshold.Text, out int value))
             {
-                if (value > 120)
+                if (value > 144)
                 {
-                    txtFpsThreshold.Text = "120";
+                    txtFpsThreshold.Text = "144";
                     txtFpsThreshold.CaretIndex = txtFpsThreshold.Text.Length;
                 }
                 else if (value < 1)
