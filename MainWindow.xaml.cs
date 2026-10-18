@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
 using System.Globalization;
+using System.Runtime.InteropServices;
 
 namespace DDTM_DSFixUI
 {
@@ -59,8 +60,8 @@ namespace DDTM_DSFixUI
 
             PopulateResolutions();
             SetupChangeTracking(this);
-            CheckDarkSoulsIni();
             LoadDSFixIni();
+            CheckDarkSoulsIni();
         }
 
         // ---- Resolutions, grouped by aspect ratio ----
@@ -203,13 +204,15 @@ namespace DDTM_DSFixUI
             }
 
             string[] lines = File.ReadAllLines(darkSoulsIniPath);
+            bool isFullscreen =IsDarkSoulsIniFullscreen();
             bool isWidthCorrect = false;
             bool isHeightCorrect = false;
             bool isWidthFullscreenCorrect = false;
             bool isHeightFullscreenCorrect = false;
             bool isAaOff = false;
             bool isBlurOff = false;
-
+            bool isScreenHzSet = txtFullscreenHz.Text.Trim() == GetCurrentRefreshRate().ToString().Trim();
+            
             // Variabilă pentru a urmări dacă citim în interiorul [DisplaySettingWindow]
             bool inDisplaySettingWindow = false;
             // Variabilă pentru a urmări dacă citim în interiorul [DisplaySettingFullScreen]
@@ -246,14 +249,19 @@ namespace DDTM_DSFixUI
             }
 
             bool isResCorrect = isWidthCorrect && isHeightCorrect && isWidthFullscreenCorrect && isHeightFullscreenCorrect;
+            bool isBorderlessCorrect = ((!isFullscreen && (chkBorderless.IsChecked == true)) || (isFullscreen && (chkBorderless.IsChecked == false)));
+            bool HzNotSet = isFullscreen && !isScreenHzSet;
+
 
             // Adaugă și isResCorrect în condiția de avertizare
-            if (!isAaOff || !isBlurOff || !isResCorrect)
+            if (!isAaOff || !isBlurOff || !isResCorrect || !isBorderlessCorrect || HzNotSet)
             {
                 string probleme = "";
                 if (!isResCorrect) probleme += $"- Game resolution setting does not match your display ({screenWidth}x{screenHeight}).\n";
                 if (!isAaOff) probleme += "- In-game Anti-Aliasing is ON (conflict with DSFix).\n";
                 if (!isBlurOff) probleme += "- In-game Motion Blur is ON.\n";
+                if (!isBorderlessCorrect) probleme += "- Borderless setting is not suitable for the in-game setting.\n";
+                if (HzNotSet) probleme += "- Fullscreen Hz not set as your monitor.\n";
 
                 MessageBoxResult result = MessageBox.Show($"In-game graphics settings are not optimal for DSFix:\n{probleme}\nWould you like to automatically adjust them for optimal performance?",
                                                           "Settings not compatible", MessageBoxButton.YesNo, MessageBoxImage.Warning);
@@ -263,7 +271,7 @@ namespace DDTM_DSFixUI
                 }
             }
         }
-
+        
         private void FixDarkSoulsIni(string[] lines)
         {
             bool inDisplaySettingWindow = false;
@@ -287,7 +295,6 @@ namespace DDTM_DSFixUI
                 if (trimmedLine.StartsWith("Antialiasing")) lines[i] = "Antialiasing = 0";
                 else if (trimmedLine.StartsWith("Blur")) lines[i] = "Blur = 0";
 
-
                 if (inDisplaySettingWindow)
                 {
                     if (trimmedLine.StartsWith("Width")) lines[i] = $"Width = {screenWidth}";
@@ -300,7 +307,30 @@ namespace DDTM_DSFixUI
                 }
             }
 
+            //borderless
+            if (IsDarkSoulsIniFullscreen()) { chkBorderless.IsChecked = false; } else { chkBorderless.IsChecked = true; }
+            //Hz
+            txtFullscreenHz.Text = GetCurrentRefreshRate().ToString();
+
             File.WriteAllLines(darkSoulsIniPath, lines);
+            BtnSaveDSFix_Click(this, new RoutedEventArgs());
+        }
+
+        private bool IsDarkSoulsIniFullscreen()
+        {
+            string[] lines = File.ReadAllLines(darkSoulsIniPath);
+            bool isFullscren = false;
+            foreach (string line in lines)
+            {
+                string trimmedLine = line.Trim();
+                if (trimmedLine == "WindowMode = 0")
+                {
+                    isFullscren = true;
+                    break;
+                }
+
+            }
+            return isFullscren;
         }
 
         private void LoadDSFixIni()
@@ -393,6 +423,9 @@ namespace DDTM_DSFixUI
                     case "swapXYIcons": chkSwapXYIcons.IsChecked = value == "1"; break;
                     case "disableItemAutoEquip": chkDisableItemAutoEquip.IsChecked = value == "1"; break;
                     case "weaponWearBars": chkDurabilityBars.IsChecked = value == "1"; break;
+                    case "bulkItemUse": chkBulkItemUse.IsChecked = value == "1"; break;
+                    case "standardSoulsBulk": chkStandardSoulsBulk.IsChecked = value == "1"; break;
+                    case "humanityBulk": chkHumanityBulk.IsChecked = value == "1"; break;
                     case "controllerIcons": if (value.Length > 0) SetComboBoxByValue(cmbControllerIcons, value.ToLowerInvariant()); break;
                 }
             }
@@ -473,6 +506,11 @@ namespace DDTM_DSFixUI
                 txtScreenshotDir.Text = ".";
                 txtD3dAdapterOverride.Text = "-1";
                 cmbLogLevel.SelectedIndex = 0;
+                cmbEnableVsync.SelectedIndex = 1;
+                txtFullscreenHz.Text = GetCurrentRefreshRate().ToString();
+
+                //check borderless
+                if (IsDarkSoulsIniFullscreen()) { chkBorderless.IsChecked = false; } else { chkBorderless.IsChecked = true; }
 
                 //check dinput8 wrapper controller
                 string DDTMControllerdllPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DDTMControllerFix.dll");
@@ -593,6 +631,16 @@ namespace DDTM_DSFixUI
             if (text == null || !System.Text.RegularExpressions.Regex.IsMatch(text, "^[0-9]+$")) e.CancelCommand();
         }
 
+        // QoL tab: when the user turns bulk item use ON, standard souls is switched on by default
+        private void chkBulkItemUse_Click(object sender, RoutedEventArgs e)
+        {
+            if (chkBulkItemUse.IsChecked == true)
+            {
+                chkStandardSoulsBulk.IsChecked = true;
+                ValidateAllControls();   // blue-violet if it differs from DSfix.ini
+            }
+        }
+
         private void SetComboBoxByValue(System.Windows.Controls.ComboBox cmb, string value)
         {
             foreach (System.Windows.Controls.ComboBoxItem item in cmb.Items)
@@ -700,6 +748,9 @@ namespace DDTM_DSFixUI
                 $"controllerIcons={GetComboBoxValue(cmbControllerIcons)}",
                 $"disableItemAutoEquip={(chkDisableItemAutoEquip.IsChecked == true ? "1" : "0")}",
                 $"weaponWearBars={(chkDurabilityBars.IsChecked == true ? "1" : "0")}",
+                $"bulkItemUse={(chkBulkItemUse.IsChecked == true ? "1" : "0")}",
+                $"standardSoulsBulk={(chkStandardSoulsBulk.IsChecked == true ? "1" : "0")}",
+                $"humanityBulk={(chkHumanityBulk.IsChecked == true ? "1" : "0")}",
 
                 // Keys mappings
                 $"toggleCursorCapture={txtKeyToggleCursorCapture.Text}|{chkKeyToggleCursorCapture.IsChecked}",
@@ -806,6 +857,9 @@ namespace DDTM_DSFixUI
                     case "swapXYIcons": chkSwapXYIcons.IsChecked = value == "1"; break;
                     case "disableItemAutoEquip": chkDisableItemAutoEquip.IsChecked = value == "1"; break;
                     case "weaponWearBars": case "durabilityBars": chkDurabilityBars.IsChecked = value == "1"; break;
+                    case "bulkItemUse": chkBulkItemUse.IsChecked = value == "1"; break;
+                    case "standardSoulsBulk": chkStandardSoulsBulk.IsChecked = value == "1"; break;
+                    case "humanityBulk": chkHumanityBulk.IsChecked = value == "1"; break;
                     case "controllerIcons": if (value.Length > 0) SetComboBoxByValue(cmbControllerIcons, value.ToLowerInvariant()); break;
 
                     default:
@@ -928,6 +982,9 @@ namespace DDTM_DSFixUI
                     case "swapXYIcons": lines[i] = $"swapXYIcons {(chkSwapXYIcons.IsChecked == true ? "1" : "0")}"; break;
                     case "disableItemAutoEquip": lines[i] = $"disableItemAutoEquip {(chkDisableItemAutoEquip.IsChecked == true ? "1" : "0")}"; break;   // never appended
                     case "weaponWearBars": lines[i] = $"weaponWearBars {(chkDurabilityBars.IsChecked == true ? "1" : "0")}"; break;               // never appended
+                    case "bulkItemUse": lines[i] = $"bulkItemUse {(chkBulkItemUse.IsChecked == true ? "1" : "0")}"; break;                        // never appended
+                    case "standardSoulsBulk": lines[i] = $"standardSoulsBulk {(chkStandardSoulsBulk.IsChecked == true ? "1" : "0")}"; break;      // never appended
+                    case "humanityBulk": lines[i] = $"humanityBulk {(chkHumanityBulk.IsChecked == true ? "1" : "0")}"; break;                     // never appended
                     case "controllerIcons": if (cmbControllerIcons.SelectedItem != null) lines[i] = $"controllerIcons {GetComboBoxValue(cmbControllerIcons)}"; break;   // never appended: older DSfix.ini files do not have it
                 }
             }
@@ -1172,7 +1229,7 @@ namespace DDTM_DSFixUI
                 txtKeyToggleDofGauss.Text = "VK_NUMPAD3";
                 txtKeyToggle30FPSLimit.Text = "VK_BACK";
                 txtKeyReloadSSAO.Text = "VK_NUMPAD5";
-                txtKeyTogglePaused.Text = "VK_F9";
+                txtKeyTogglePaused.Text = "VK_F10";
                 txtKeyToggleSharpen.Text = "VK_F4";
                 ValidateAllControls();
             }
@@ -1393,6 +1450,47 @@ namespace DDTM_DSFixUI
             {
                 ValidateControlColor(ctrl);
             }
+        }
+
+        // ---- Monitor refresh rate (Hz) ----
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        private struct DEVMODE
+        {
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)] public string dmDeviceName;
+            public short dmSpecVersion, dmDriverVersion, dmSize, dmDriverExtra;
+            public int dmFields, dmPositionX, dmPositionY, dmDisplayOrientation, dmDisplayFixedOutput;
+            public short dmColor, dmDuplex, dmYResolution, dmTTOption, dmCollate;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)] public string dmFormName;
+            public short dmLogPixels;
+            public int dmBitsPerPel, dmPelsWidth, dmPelsHeight, dmDisplayFlags, dmDisplayFrequency;
+            public int dmICMMethod, dmICMIntent, dmMediaType, dmDitherType, dmReserved1, dmReserved2, dmPanningWidth, dmPanningHeight;
+        }
+
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        private static extern bool EnumDisplaySettings(string deviceName, int modeNum, ref DEVMODE devMode);
+
+        private const int ENUM_CURRENT_SETTINGS = -1;
+
+        // Refresh rate currently set on the main monitor (0 = could not be read)
+        private static int GetCurrentRefreshRate()
+        {
+            var dm = new DEVMODE { dmSize = (short)Marshal.SizeOf(typeof(DEVMODE)) };
+            if (!EnumDisplaySettings(null, ENUM_CURRENT_SETTINGS, ref dm)) return 0;
+            return dm.dmDisplayFrequency > 1 ? dm.dmDisplayFrequency : 0;   // 0 or 1 = "hardware default", unknown
+        }
+
+        // Highest refresh rate the main monitor supports at its current resolution
+        private static int GetMaxRefreshRate()
+        {
+            var cur = new DEVMODE { dmSize = (short)Marshal.SizeOf(typeof(DEVMODE)) };
+            if (!EnumDisplaySettings(null, ENUM_CURRENT_SETTINGS, ref cur)) return 0;
+
+            int max = 0;
+            var dm = new DEVMODE { dmSize = (short)Marshal.SizeOf(typeof(DEVMODE)) };
+            for (int i = 0; EnumDisplaySettings(null, i, ref dm); i++)
+                if (dm.dmPelsWidth == cur.dmPelsWidth && dm.dmPelsHeight == cur.dmPelsHeight && dm.dmDisplayFrequency > max)
+                    max = dm.dmDisplayFrequency;
+            return max;
         }
     }
 }
