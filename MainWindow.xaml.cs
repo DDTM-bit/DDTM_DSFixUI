@@ -426,6 +426,7 @@ namespace DDTM_DSFixUI
                     case "bulkItemUse": chkBulkItemUse.IsChecked = value == "1"; break;
                     case "standardSoulsBulk": chkStandardSoulsBulk.IsChecked = value == "1"; break;
                     case "humanityBulk": chkHumanityBulk.IsChecked = value == "1"; break;
+                    case "covenantOfferings": chkCovenantOfferings.IsChecked = value == "1"; break;
                     case "controllerIcons": if (value.Length > 0) SetComboBoxByValue(cmbControllerIcons, value.ToLowerInvariant()); break;
                 }
             }
@@ -751,6 +752,7 @@ namespace DDTM_DSFixUI
                 $"bulkItemUse={(chkBulkItemUse.IsChecked == true ? "1" : "0")}",
                 $"standardSoulsBulk={(chkStandardSoulsBulk.IsChecked == true ? "1" : "0")}",
                 $"humanityBulk={(chkHumanityBulk.IsChecked == true ? "1" : "0")}",
+                $"covenantOfferings={(chkCovenantOfferings.IsChecked == true ? "1" : "0")}",
 
                 // Keys mappings
                 $"toggleCursorCapture={txtKeyToggleCursorCapture.Text}|{chkKeyToggleCursorCapture.IsChecked}",
@@ -860,6 +862,7 @@ namespace DDTM_DSFixUI
                     case "bulkItemUse": chkBulkItemUse.IsChecked = value == "1"; break;
                     case "standardSoulsBulk": chkStandardSoulsBulk.IsChecked = value == "1"; break;
                     case "humanityBulk": chkHumanityBulk.IsChecked = value == "1"; break;
+                    case "covenantOfferings": chkCovenantOfferings.IsChecked = value == "1"; break;
                     case "controllerIcons": if (value.Length > 0) SetComboBoxByValue(cmbControllerIcons, value.ToLowerInvariant()); break;
 
                     default:
@@ -985,6 +988,7 @@ namespace DDTM_DSFixUI
                     case "bulkItemUse": lines[i] = $"bulkItemUse {(chkBulkItemUse.IsChecked == true ? "1" : "0")}"; break;                        // never appended
                     case "standardSoulsBulk": lines[i] = $"standardSoulsBulk {(chkStandardSoulsBulk.IsChecked == true ? "1" : "0")}"; break;      // never appended
                     case "humanityBulk": lines[i] = $"humanityBulk {(chkHumanityBulk.IsChecked == true ? "1" : "0")}"; break;                     // never appended
+                    case "covenantOfferings": lines[i] = $"covenantOfferings {(chkCovenantOfferings.IsChecked == true ? "1" : "0")}"; break;       // never appended
                     case "controllerIcons": if (cmbControllerIcons.SelectedItem != null) lines[i] = $"controllerIcons {GetComboBoxValue(cmbControllerIcons)}"; break;   // never appended: older DSfix.ini files do not have it
                 }
             }

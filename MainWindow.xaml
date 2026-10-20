@@ -333,6 +333,11 @@
                             <CheckBox Name="chkStandardSoulsBulk" Content="Standard souls (Without Fire Keeper Soul and Boss Souls)" Foreground="White" Margin="0,5,0,0" ToolTip="The ten ordinary soul items, Soul of a Lost Undead up to Soul of a Great Hero.&#x0a;Only matters when bulk item use is on."/>
                             <CheckBox Name="chkHumanityBulk" Content="Humanity and Twin Humanities" Foreground="White" Margin="0,5,0,0" ToolTip="Humanity and Twin Humanities (the number offered never passes the 99 humanity cap).&#x0a;Only matters when bulk item use is on."/>
                         </StackPanel>
+                        <Separator Height="6" Background="#FF736554" Margin="0,15,0,0"/>
+
+                        <!-- Covenants -->
+                        <TextBlock Text="Covenants" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,15,0,5"/>
+                        <CheckBox Name="chkCovenantOfferings" Content="Offer several items at once to a covenant" Foreground="White" Margin="0,5,0,0" ToolTip="Offer several at once to a covenant.&#x0a;The &quot;Offer ...?&quot; question at an altar or covenant leader becomes the game's own number picker, and the chosen number of items (or of humanity) is offered in one step.&#x0a;The picker never offers enough to reach the next covenant rank, so the offering that ranks you up is always the game's own single question and its reward arrives exactly as before."/>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
