@@ -408,6 +408,28 @@
                         <Label Width="450" Content="Backups are stored in the save folder as '[timestamp]_[original name].bak'" FontStyle="Italic" FontSize="12" Foreground="#FF7F7F7F" HorizontalAlignment="Center" Height="33"/>
                     </WrapPanel>
 
+                    <!-- Quick Save Feature (independent of Enable Save Backups) -->
+                    <Separator Height="6" Background="#FF736554" Margin="0,15,0,0"/>
+                    <TextBlock Text="Quick Save Feature" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,15,0,5"/>
+                    <CheckBox Name="chkQuickSave" Content="Quick Save" Foreground="White" Margin="0,5,0,0" ToolTip="While playing, the Quick Save key makes the game save and copies your character to QuickSave\QS_DRAKS0005 next to the save file.&#x0a;Only that character is copied; every quick save replaces the last one."/>
+                    <TextBlock Text="Quick save copies the current character to the QuickSave folder next to the save file (every quick save replaces the last one). Quick load: press its key twice within 3 seconds while playing; the game goes to the title screen and loads the quick save automatically. Your save from just before is kept as QuickSave\BeforeQuickLoad..._DRAKS0005.sl2.bak." Foreground="#FF9A9A9A" FontStyle="Italic" FontSize="12" TextWrapping="Wrap" Margin="20,4,0,0"/>
+                    <!-- keys: faded and disabled while Quick Save is off -->
+                    <WrapPanel x:Name="panelQuickSaveKeys" Margin="20,8,0,0" IsEnabled="{Binding IsChecked, ElementName=chkQuickSave}">
+                        <WrapPanel.Style>
+                            <Style TargetType="WrapPanel">
+                                <Style.Triggers>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter Property="Opacity" Value="0.4"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </WrapPanel.Style>
+                        <Label Content="Quick Save Key:"/>
+                        <TextBox Name="txtQuickSaveKey" Width="120" Text="VK_F5" Margin="0,0,25,0" VerticalAlignment="Center" ToolTip="The key for quick save (key names as in DSfixKeys.ini: VK_F5, VK_F6, ...)."/>
+                        <Label Content="Quick Load Key:"/>
+                        <TextBox Name="txtQuickLoadKey" Width="120" Text="VK_F9" VerticalAlignment="Center" ToolTip="The key for quick load (needs Quick Save on). Press it twice within 3 seconds while playing.&#x0a;none = off."/>
+                    </WrapPanel>
+
                 </StackPanel>
             </TabItem>
 
