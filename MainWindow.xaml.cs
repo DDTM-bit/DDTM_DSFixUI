@@ -409,6 +409,7 @@ namespace DDTM_DSFixUI
                     case "quickSave": chkQuickSave.IsChecked = value == "1"; break;
                     case "quickSaveKey": txtQuickSaveKey.Text = value; break;
                     case "quickLoadKey": txtQuickLoadKey.Text = value; break;
+                    case "quickLoadDoublePress": chkQuickLoadDoublePress.IsChecked = value == "1"; break;
 
                     case "enableTextureDumping": chkEnableTextureDumping.IsChecked = value == "1"; break;
                     case "enableTextureOverride": chkTextureOverride.IsChecked = value == "1"; break;
@@ -752,6 +753,7 @@ namespace DDTM_DSFixUI
                 $"quickSave={(chkQuickSave.IsChecked == true ? "1" : "0")}",
                 $"quickSaveKey={GetQuickSaveKeyValue()}",
                 $"quickLoadKey={GetQuickLoadKeyValue()}",
+                $"quickLoadDoublePress={(chkQuickLoadDoublePress.IsChecked == true ? "1" : "0")}",
 
                 $"enableTextureDumping={(chkEnableTextureDumping.IsChecked == true ? "1" : "0")}",
                 $"enableTextureOverride={(chkTextureOverride.IsChecked == true ? "1" : "0")}",
@@ -866,6 +868,7 @@ namespace DDTM_DSFixUI
                     case "quickSave": chkQuickSave.IsChecked = value == "1"; break;
                     case "quickSaveKey": txtQuickSaveKey.Text = value; break;
                     case "quickLoadKey": txtQuickLoadKey.Text = value; break;
+                    case "quickLoadDoublePress": chkQuickLoadDoublePress.IsChecked = value == "1"; break;
 
                     case "enableTextureDumping": chkEnableTextureDumping.IsChecked = value == "1"; break;
                     case "enableTextureOverride": chkTextureOverride.IsChecked = value == "1"; break;
@@ -995,6 +998,7 @@ namespace DDTM_DSFixUI
                     case "quickSave": lines[i] = $"quickSave {(chkQuickSave.IsChecked == true ? "1" : "0")}"; break;
                     case "quickSaveKey": lines[i] = $"quickSaveKey {GetQuickSaveKeyValue()}"; break;
                     case "quickLoadKey": lines[i] = $"quickLoadKey {GetQuickLoadKeyValue()}"; break;
+                    case "quickLoadDoublePress": lines[i] = $"quickLoadDoublePress {(chkQuickLoadDoublePress.IsChecked == true ? "1" : "0")}"; break;
 
                     case "enableTextureDumping": lines[i] = $"enableTextureDumping {(chkEnableTextureDumping.IsChecked == true ? "1" : "0")}"; break;
                     case "enableTextureOverride": lines[i] = $"enableTextureOverride {(chkTextureOverride.IsChecked == true ? "1" : "0")}"; break;
