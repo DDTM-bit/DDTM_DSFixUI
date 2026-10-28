@@ -310,13 +310,13 @@
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="10">
                         <!-- Items & HUD -->
-                        <TextBlock Text="Items &amp; HUD" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,5,0,5"/>
-                        <CheckBox Name="chkDisableItemAutoEquip" Content="Disable item auto-equip (Estus unchanged)" Foreground="White" Margin="0,5,0,0" ToolTip="Consumables you pick up are no longer put into your quick item slots automatically (Estus unchanged)."/>
+                        <TextBlock Text="HUD &amp; Menu" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,5,0,5"/>
                         <CheckBox Name="chkDurabilityBars" Content="Show weapon durability bars (Dark Souls III Style)" Foreground="White" Margin="0,5,0,0" ToolTip="Thin bar under each weapon slot showing durability left (bottom-left HUD)."/>
                         <Separator Height="6" Background="#FF736554" Margin="0,15,0,0"/>
 
                         <!-- Bulk item use -->
-                        <TextBlock Text="Bulk item use" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,15,0,5"/>
+                        <TextBlock Text="Items" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,15,0,5"/>
+                        <CheckBox Name="chkDisableItemAutoEquip" Content="Disable item auto-equip (Estus unchanged)" Foreground="White" Margin="0,5,0,0" ToolTip="Consumables you pick up are no longer put into your quick item slots automatically (Estus unchanged)."/>
                         <CheckBox Name="chkBulkItemUse" Content="Use several of the same item at once (master switch)" Foreground="White" Margin="0,5,0,0" Click="chkBulkItemUse_Click" ToolTip="Use several of the same item at once (master switch).&#x0a;In the pause Inventory menu, using a listed item asks how many to use and uses them all with a single animation.&#x0a;The quick-item button during play behaves as before, and any item that is not listed keeps its normal behaviour, so Boss Souls and Fire Keeper Souls still ask their own Yes/No question.&#x0a;The number offered is never more than you own and never so many that the reward would be lost at the game's limit.&#x0a;Owning only one uses it straight away with no question."/>
                         <TextBlock Text="In the pause Inventory menu, using a listed item asks how many to use and uses them all with a single animation. The groups below only matter when this is on; a group that is off is never touched." Foreground="#FF9A9A9A" FontStyle="Italic" FontSize="12" TextWrapping="Wrap" Margin="20,4,0,0"/>
                         <!-- groups: faded and disabled while the master switch is off -->
