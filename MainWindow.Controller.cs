@@ -98,6 +98,8 @@ namespace DDTM_DSFixUI
                 txt.IsEnabled = chk.IsChecked == true;
                 txt.PreviewTextInput += NumericOnly_PreviewTextInput;
             }
+
+            InitKbmTab();   // KEYBOARD & MOUSE sub tab: builds its rows (MainWindow.KeyboardMouse.cs)
         }
 
         private void PopulateButtonCombo(ComboBox cmb)
@@ -230,10 +232,14 @@ namespace DDTM_DSFixUI
         {
             ReadControllerFile(controllerIniPath, out var kv, out var back, out var advOff);
             ApplyControllerValues(kv, back, advOff);
+            ReadKbmFile(controllerIniPath, out var kb, out var mouse, out bool hasKeyboard);   // KEYBOARD & MOUSE sub tab
+            ApplyKbmValues(kb, mouse, hasKeyboard);
             SnapshotCurrentValues(tabController);   // this is the "saved" state for change colouring
         }
 
-        // Parses a DDTMControllerMappings.ini (or a profile file with the same format)
+        // Parses a DDTMControllerMappings.ini (or a profile file with the same format).
+        // The [Keyboard] / [Mouse] sections are skipped: they use some of the same names (KICK, LEAP_ATTACK,
+        // DASH_SPRINT_ONLY) and are read by ReadKbmFile (MainWindow.KeyboardMouse.cs).
         private static void ReadControllerFile(string path, out Dictionary<string, string> kv,
                                                out List<string> back, out Dictionary<string, string> advOff)
         {
@@ -241,10 +247,13 @@ namespace DDTM_DSFixUI
             back = new List<string>();
             advOff = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
+            bool kbmSection = false;
             foreach (string line in File.ReadAllLines(path))
             {
                 string t = line.Trim();
                 if (t.Length == 0) continue;
+                if (t.StartsWith("[")) { kbmSection = IsKbmSection(t); continue; }   // section header
+                if (kbmSection) continue;   // [Keyboard] / [Mouse]: read by ReadKbmFile
 
                 if (t.StartsWith("#"))
                 {
@@ -252,8 +261,6 @@ namespace DDTM_DSFixUI
                     if (m.Success) advOff[m.Groups[1].Value] = m.Groups[2].Value;
                     continue;
                 }
-                if (t.StartsWith("[")) continue;   // section header
-
                 int eq = t.IndexOf('=');
                 if (eq <= 0) continue;
                 string key = t.Substring(0, eq).Trim();
@@ -325,7 +332,7 @@ namespace DDTM_DSFixUI
         // ------------------------------------------------------------------
         private void BtnLoadControllerDefaults_Click(object sender, RoutedEventArgs e)
         {
-            var result = MessageBox.Show("Replace ALL settings of the 4 controller tabs with the default values?\nNothing is written to the .ini until you press SAVE.",
+            var result = MessageBox.Show("Replace ALL settings of all the tabs (controller, keyboard and mouse) with the default values?\nNothing is written to the .ini until you press SAVE.",
                                          "Load default settings", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result != MessageBoxResult.Yes) return;
 
@@ -337,6 +344,7 @@ namespace DDTM_DSFixUI
             var kv = new Dictionary<string, string>(ControllerDefaults, StringComparer.OrdinalIgnoreCase);
             foreach (string k in AdvancedKeys) kv.Remove(k);    // advanced values are shipped disabled
             ApplyControllerValues(kv, new List<string>(DefaultBack), advOff);
+            ApplyKbmDefaults();   // KEYBOARD & MOUSE sub tab
             ValidateAllControls();
         }
 
@@ -413,11 +421,12 @@ namespace DDTM_DSFixUI
             AskSyncPromptIconsWithMapping();
         }
 
-        // Builds the full .ini text from the 4 sub tabs, using 'template' (an existing file's lines)
+        // Builds the full .ini text from all the sub tabs, using 'template' (an existing file's lines)
         // so all comments are kept. Returns null when a value is invalid.
+        // The controller sections are written here; the [Keyboard] / [Mouse] sections by ApplyKbmLines.
         private List<string> BuildControllerIniLines(string[] template)
         {
-            // ---- collect values from the 4 sub tabs ----
+            // ---- collect values from the controller sub tabs ----
             var values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             values["Preset"] = GetSelectedPreset();
             foreach (string k in MappingKeys) values[k] = GetButton(Ctl<ComboBox>("cmbMap_" + k));
@@ -461,10 +470,14 @@ namespace DDTM_DSFixUI
             var output = new List<string>();
             var written = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             bool backWritten = false;
+            bool kbmSection = false;
 
             foreach (string line in original)
             {
                 string t = line.Trim();
+
+                if (t.StartsWith("[")) kbmSection = IsKbmSection(t);
+                if (kbmSection) { output.Add(line); continue; }   // [Keyboard] / [Mouse]: done by ApplyKbmLines below
 
                 if (t.StartsWith("#"))
                 {
@@ -518,6 +531,9 @@ namespace DDTM_DSFixUI
                 if (isAdv && !on) continue;     // disabled + absent: nothing to write
                 InsertIntoSection(output, KeySection(kvp.Key), kvp.Key + " = " + kvp.Value);
             }
+
+            // ---- KEYBOARD & MOUSE sub tab: [Keyboard] and [Mouse] sections ----
+            ApplyKbmLines(output);
 
             return output;
         }

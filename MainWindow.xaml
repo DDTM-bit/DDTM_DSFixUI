@@ -316,7 +316,7 @@
 
                         <!-- Bulk item use -->
                         <TextBlock Text="Items" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,15,0,5"/>
-                        <CheckBox Name="chkDisableItemAutoEquip" Content="Disable item auto-equip (Estus unchanged)" Foreground="White" Margin="0,5,0,0" ToolTip="Consumables you pick up are no longer put into your quick item slots automatically (Estus unchanged)."/>
+                        <CheckBox Name="chkDisableItemAutoEquip" Content="Disable consumables auto-equip (Estus unchanged)" Foreground="White" Margin="0,5,0,0" ToolTip="Consumables you pick up are no longer put into your quick item slots automatically (Estus unchanged)."/>
                         <CheckBox Name="chkBulkItemUse" Content="Use several of the same item at once (master switch)" Foreground="White" Margin="0,5,0,0" Click="chkBulkItemUse_Click" ToolTip="Use several of the same item at once (master switch).&#x0a;In the pause Inventory menu, using a listed item asks how many to use and uses them all with a single animation.&#x0a;The quick-item button during play behaves as before, and any item that is not listed keeps its normal behaviour, so Boss Souls and Fire Keeper Souls still ask their own Yes/No question.&#x0a;The number offered is never more than you own and never so many that the reward would be lost at the game's limit.&#x0a;Owning only one uses it straight away with no question."/>
                         <TextBlock Text="In the pause Inventory menu, using a listed item asks how many to use and uses them all with a single animation. The groups below only matter when this is on; a group that is off is never touched." Foreground="#FF9A9A9A" FontStyle="Italic" FontSize="12" TextWrapping="Wrap" Margin="20,4,0,0"/>
                         <!-- groups: faded and disabled while the master switch is off -->
@@ -586,7 +586,7 @@
                 </ScrollViewer>
             </TabItem>
             <!-- 8. DDTM CONTROLLER -->
-            <TabItem Header="DDTM Controller" x:Name="tabController">
+            <TabItem Header="DDTM Controls" x:Name="tabController">
                 <Grid>
                     <Grid x:Name="gridController">
                         <Grid.Resources>
@@ -1216,6 +1216,119 @@
                                     </StackPanel>
                                 </ScrollViewer>
                             </TabItem>
+                            <TabItem Header="KEYBOARD &amp; MOUSE">
+                                <ScrollViewer x:Name="svKbm" VerticalScrollBarVisibility="Auto">
+                                    <StackPanel Margin="10">
+                                        <Border Background="#2A2A2A" BorderBrush="#5A4A3A" BorderThickness="1" CornerRadius="5" Padding="10" Margin="0,0,0,6">
+                                            <StackPanel>
+                                                <TextBlock Text="How to assign a key" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,0,0,4"/>
+                                                <StackPanel>
+                                                    <TextBlock Text="1. Click a box. It turns orange: it is waiting for your input." Foreground="#D3D3D3" FontSize="12" TextWrapping="Wrap"/>
+                                                    <TextBlock Text="2. Press a keyboard key, click a mouse button on the box (left, right, middle, side buttons 4 / 5), or turn the mouse wheel over the box." Foreground="#D3D3D3" FontSize="12" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                                                    <TextBlock Text="3. Clicking anywhere else cancels and keeps the old key. The &#x2715; button removes the key (the action is then NONE)." Foreground="#D3D3D3" FontSize="12" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                                                    <TextBlock Text="Some actions have two boxes: KEY + KEY is a combination of two keys (the second box can stay empty). While a combination is held, only its action happens, not the action of its keys alone." Foreground="#D3D3D3" FontSize="12" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                                                </StackPanel>
+                                                <TextBlock Text="Keyboard and mouse always work together with the controller and never change the controller settings. The game's own keyboard settings are ignored. The names in the boxes are exactly what is written in the [Keyboard] and [Mouse] sections of DDTMControllerMappings.ini." Foreground="#A8A8A8" FontSize="12" TextWrapping="Wrap" Margin="0,6,0,0"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <TextBlock Text="Movement" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,14,0,2"/>
+                                        <TextBlock Text="The keys move the character like the left stick. The camera is moved with the mouse only." Foreground="#A8A8A8" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,6"/>
+                                        <Border Background="#2D2D2D" BorderBrush="#5A4A3A" BorderThickness="1" CornerRadius="5" Padding="8">
+                                            <StackPanel x:Name="panelKbm_Movement"/>
+                                        </Border>
+
+                                        <TextBlock Text="Combat" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,14,0,2"/>
+                                        <TextBlock Text="These actions can use a combination of two keys (for example LSHIFT + MOUSE_LEFT)." Foreground="#A8A8A8" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,6"/>
+                                        <Border Background="#2D2D2D" BorderBrush="#5A4A3A" BorderThickness="1" CornerRadius="5" Padding="8">
+                                            <StackPanel x:Name="panelKbm_Combat"/>
+                                        </Border>
+
+                                        <TextBlock Text="Equipment" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,14,0,2"/>
+                                        <TextBlock Text="Switch weapons, items and magic (the D-pad on a controller). These can also use a combination of two keys." Foreground="#A8A8A8" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,6"/>
+                                        <Border Background="#2D2D2D" BorderBrush="#5A4A3A" BorderThickness="1" CornerRadius="5" Padding="8">
+                                            <StackPanel x:Name="panelKbm_Equipment"/>
+                                        </Border>
+
+                                        <TextBlock Text="Actions" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,14,0,2"/>
+                                        <TextBlock Text="These keys also work in menus (as A, X, Y, START and BACK). In menus the Dash / roll / backstep key works as B (back)." Foreground="#A8A8A8" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,6"/>
+                                        <Border Background="#2D2D2D" BorderBrush="#5A4A3A" BorderThickness="1" CornerRadius="5" Padding="8">
+                                            <StackPanel x:Name="panelKbm_Actions"/>
+                                        </Border>
+
+                                        <TextBlock Text="Lock on and targets" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,14,0,2"/>
+                                        <TextBlock Text="While locked on, a fast mouse flick left or right also switches the target. While aiming a bow or crossbow, the mouse wheel zooms instead." Foreground="#A8A8A8" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,6"/>
+                                        <Border Background="#2D2D2D" BorderBrush="#5A4A3A" BorderThickness="1" CornerRadius="5" Padding="8">
+                                            <StackPanel x:Name="panelKbm_Target"/>
+                                        </Border>
+
+                                        <TextBlock Text="Menu tabs" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,14,0,2"/>
+                                        <TextBlock Text="Change the tab in the quick menu and the menus opened from it (LB / RB on a controller). They can use the same keys as gameplay actions: inside those menus the key only changes the tab." Foreground="#A8A8A8" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,6"/>
+                                        <Border Background="#2D2D2D" BorderBrush="#5A4A3A" BorderThickness="1" CornerRadius="5" Padding="8">
+                                            <StackPanel x:Name="panelKbm_Menus"/>
+                                        </Border>
+
+                                        <Separator Height="6" Background="#FF736554" Margin="0,12,0,0"/>
+                                        <TextBlock Text="Mouse camera" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,14,0,2"/>
+                                        <TextBlock Text="1.0 = normal. 2.0 = twice as fast. 0.5 = half speed. Not changed by the Windows mouse speed or 'Enhance pointer precision'. The controller sticks have their own settings in ADVANCED SETTINGS." Foreground="#A8A8A8" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,6"/>
+                                        <Grid Margin="0,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="210"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="70"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Label Content="Camera - X (left / right)" VerticalAlignment="Center" ToolTip="Mouse camera speed, left / right. 1.0 = normal.&#x0a;In DDTMControllerMappings.ini: Sensitivity_X"/>
+                                            <Slider Grid.Column="1" x:Name="sldKbm_Sensitivity_X" Minimum="0.1" Maximum="5.0" Value="1.0" SmallChange="0.05" LargeChange="0.25" TickFrequency="0.25" TickPlacement="BottomRight" IsSnapToTickEnabled="False" Foreground="White" VerticalAlignment="Center" Margin="5,0" Tag="{Binding ElementName=valKbm_Sensitivity_X}" ToolTip="Mouse camera speed, left / right. 1.0 = normal.&#x0a;In DDTMControllerMappings.ini: Sensitivity_X"/>
+                                            <TextBlock Grid.Column="2" x:Name="valKbm_Sensitivity_X" Text="{Binding Value, ElementName=sldKbm_Sensitivity_X, StringFormat=F2, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,6,0"/>
+                                        </Grid>
+                                        <Grid Margin="0,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="210"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="70"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Label Content="Camera - Y (up / down)" VerticalAlignment="Center" ToolTip="Mouse camera speed, up / down. 1.0 = normal.&#x0a;In DDTMControllerMappings.ini: Sensitivity_Y"/>
+                                            <Slider Grid.Column="1" x:Name="sldKbm_Sensitivity_Y" Minimum="0.1" Maximum="5.0" Value="1.0" SmallChange="0.05" LargeChange="0.25" TickFrequency="0.25" TickPlacement="BottomRight" IsSnapToTickEnabled="False" Foreground="White" VerticalAlignment="Center" Margin="5,0" Tag="{Binding ElementName=valKbm_Sensitivity_Y}" ToolTip="Mouse camera speed, up / down. 1.0 = normal.&#x0a;In DDTMControllerMappings.ini: Sensitivity_Y"/>
+                                            <TextBlock Grid.Column="2" x:Name="valKbm_Sensitivity_Y" Text="{Binding Value, ElementName=sldKbm_Sensitivity_Y, StringFormat=F2, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,6,0"/>
+                                        </Grid>
+                                        <Grid Margin="0,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="210"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="70"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Label Content="Bow aiming - X" VerticalAlignment="Center" ToolTip="Mouse speed while aiming a bow or crossbow, left / right. 1.0 = normal.&#x0a;In DDTMControllerMappings.ini: Bow_Sensitivity_X"/>
+                                            <Slider Grid.Column="1" x:Name="sldKbm_Bow_Sensitivity_X" Minimum="0.1" Maximum="5.0" Value="1.0" SmallChange="0.05" LargeChange="0.25" TickFrequency="0.25" TickPlacement="BottomRight" IsSnapToTickEnabled="False" Foreground="White" VerticalAlignment="Center" Margin="5,0" Tag="{Binding ElementName=valKbm_Bow_Sensitivity_X}" ToolTip="Mouse speed while aiming a bow or crossbow, left / right. 1.0 = normal.&#x0a;In DDTMControllerMappings.ini: Bow_Sensitivity_X"/>
+                                            <TextBlock Grid.Column="2" x:Name="valKbm_Bow_Sensitivity_X" Text="{Binding Value, ElementName=sldKbm_Bow_Sensitivity_X, StringFormat=F2, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,6,0"/>
+                                        </Grid>
+                                        <Grid Margin="0,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="210"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="70"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Label Content="Bow aiming - Y" VerticalAlignment="Center" ToolTip="Mouse speed while aiming a bow or crossbow, up / down. 1.0 = normal.&#x0a;In DDTMControllerMappings.ini: Bow_Sensitivity_Y"/>
+                                            <Slider Grid.Column="1" x:Name="sldKbm_Bow_Sensitivity_Y" Minimum="0.1" Maximum="5.0" Value="1.0" SmallChange="0.05" LargeChange="0.25" TickFrequency="0.25" TickPlacement="BottomRight" IsSnapToTickEnabled="False" Foreground="White" VerticalAlignment="Center" Margin="5,0" Tag="{Binding ElementName=valKbm_Bow_Sensitivity_Y}" ToolTip="Mouse speed while aiming a bow or crossbow, up / down. 1.0 = normal.&#x0a;In DDTMControllerMappings.ini: Bow_Sensitivity_Y"/>
+                                            <TextBlock Grid.Column="2" x:Name="valKbm_Bow_Sensitivity_Y" Text="{Binding Value, ElementName=sldKbm_Bow_Sensitivity_Y, StringFormat=F2, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,6,0"/>
+                                        </Grid>
+                                        <CheckBox x:Name="chkKbm_Invert_X" Content="Invert left / right (Invert_X)" Foreground="White" Margin="0,8,0,0" ToolTip="Moving the mouse left turns the camera right.&#x0a;Works for the normal camera and for bow aiming."/>
+                                        <CheckBox x:Name="chkKbm_Invert_Y" Content="Invert up / down (Invert_Y)" Foreground="White" Margin="0,4,0,0" ToolTip="Moving the mouse up looks down (like a flight game).&#x0a;Works for the normal camera and for bow aiming."/>
+
+                                        <Separator Height="6" Background="#FF736554" Margin="0,12,0,0"/>
+                                        <TextBlock Text="Good to know" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,14,0,2"/>
+                                        <Border Background="#2A2A2A" BorderBrush="#5A4A3A" BorderThickness="1" CornerRadius="5" Padding="10" Margin="0,0,0,6">
+                                            <StackPanel>
+                                                <TextBlock Text="&#x2022; In menus: the arrow keys move, ENTER confirms, BACKSPACE goes back, ESC works like START (on the title screen ESC goes back). The mouse can click in menus too." Foreground="#D3D3D3" FontSize="12" TextWrapping="Wrap"/>
+                                                <TextBlock Text="&#x2022; In menus only these keys work: the Actions keys (Interact = A, Use item = X, Two-hand = Y, Menu = START, Gestures = BACK), Dash / roll / backstep (= B, goes back) and the Menu tab keys. Everything else is ignored there." Foreground="#D3D3D3" FontSize="12" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                                                <TextBlock Text="&#x2022; With a bow or crossbow held two-handed, and while aiming: MOUSE_LEFT shoots and MOUSE_RIGHT changes the arrow / bolt type, whatever keys are set above. While aiming, the mouse wheel zooms." Foreground="#D3D3D3" FontSize="12" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                                                <TextBlock Text="&#x2022; ESC does nothing in gameplay unless you give it to an action." Foreground="#D3D3D3" FontSize="12" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                                                <TextBlock Text="&#x2022; With DSfix: if you turn the HUD off in the game options, also set enableHudMod 0 in DSfix.ini, or mouse clicks in menus land in the wrong place." Foreground="#D3D3D3" FontSize="12" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                                                <TextBlock Text="&#x2022; An action written on two lines in the .ini (two different keys) keeps its second line when you save. Only the first line is shown here." Foreground="#D3D3D3" FontSize="12" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
                         </TabControl>
                         <Grid Grid.Row="1" Margin="5,0,5,5">
                             <Grid.ColumnDefinitions>
@@ -1225,10 +1338,10 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <Button x:Name="BtnSaveController" Grid.Column="0" Content="SAVE Controller settings" Background="#FF8C00" Foreground="Black" FontWeight="Bold" FontSize="14" Click="BtnSaveController_Click" ToolTip="Writes every setting of the 4 tabs into DDTMControllerMappings.ini (comments are kept)."/>
-                            <Button x:Name="BtnLoadControllerDefaults" Grid.Column="1" Content="Load default settings" Click="BtnLoadControllerDefaults_Click" FontSize="14" ToolTip="Fills all 4 tabs with the default values. Nothing is written until you press SAVE."/>
-                            <Button x:Name="BtnSaveControllerProfile" Grid.Column="2" Content="Save Profile" Click="BtnSaveControllerProfile_Click" FontSize="14" Margin="25,5,5,5" ToolTip="Saves every setting of the 4 tabs (as they are now on screen) into a profile file of your choice."/>
-                            <Button x:Name="BtnLoadControllerProfile" Grid.Column="3" Content="Load Profile" Click="BtnLoadControllerProfile_Click" FontSize="14" ToolTip="Loads a profile file into the 4 tabs. Nothing is written to DDTMControllerMappings.ini until you press SAVE Controller settings."/>
+                            <Button x:Name="BtnSaveController" Grid.Column="0" Content="SAVE Controls settings" Background="#FF8C00" Foreground="Black" FontWeight="Bold" FontSize="14" Click="BtnSaveController_Click" ToolTip="Writes every setting of all the tabs (controller, keyboard and mouse) into DDTMControllerMappings.ini (comments are kept)."/>
+                            <Button x:Name="BtnLoadControllerDefaults" Grid.Column="1" Content="Load default settings" Click="BtnLoadControllerDefaults_Click" FontSize="14" ToolTip="Fills all the tabs (controller, keyboard and mouse) with the default values. Nothing is written until you press SAVE."/>
+                            <Button x:Name="BtnSaveControllerProfile" Grid.Column="2" Content="Save Profile" Click="BtnSaveControllerProfile_Click" FontSize="14" Margin="25,5,5,5" ToolTip="Saves every setting of all the tabs (controller, keyboard and mouse, as they are now on screen) into a profile file of your choice."/>
+                            <Button x:Name="BtnLoadControllerProfile" Grid.Column="3" Content="Load Profile" Click="BtnLoadControllerProfile_Click" FontSize="14" ToolTip="Loads a profile file into all the tabs (controller, keyboard and mouse). Nothing is written to DDTMControllerMappings.ini until you press SAVE Controller settings."/>
                             <Label x:Name="labelControllerSaved" Grid.Column="4" Content="Saved!" Foreground="#FF3C7742" FontSize="13" VerticalAlignment="Center" Visibility="Hidden"/>
                         </Grid>
                     </Grid>

@@ -242,9 +242,12 @@ namespace DDTM_DSFixUI
             Dictionary<string, string> kv;
             List<string> back;
             Dictionary<string, string> advOff;
+            Dictionary<string, string> kb, mouse;
+            bool hasKeyboard;
             try
             {
                 ReadControllerFile(dialog.FileName, out kv, out back, out advOff);
+                ReadKbmFile(dialog.FileName, out kb, out mouse, out hasKeyboard);   // KEYBOARD & MOUSE sub tab
             }
             catch (Exception ex)
             {
@@ -252,18 +255,24 @@ namespace DDTM_DSFixUI
                 return;
             }
 
-            // a valid profile must contain at least one known controller key
-            bool known = back.Count > 0 || kv.Keys.Any(k => ControllerDefaults.ContainsKey(k));
-            if (!known)
+            // a valid profile must contain at least one known controller, keyboard or mouse key
+            bool knownController = back.Count > 0 || kv.Keys.Any(k => ControllerDefaults.ContainsKey(k));
+            bool knownKbm = hasKeyboard || mouse.Count > 0;
+            if (!knownController && !knownKbm)
             {
                 MessageBox.Show("This file does not contain any DDTM Controller settings.", "Load Profile", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            ApplyControllerValues(kv, back, advOff);
+            // a profile with only one part (an older profile has no keyboard / mouse) leaves the other part as it is now
+            if (knownController) ApplyControllerValues(kv, back, advOff);
+            if (knownKbm) ApplyKbmValues(kb, mouse, hasKeyboard);
             ValidateAllControls();   // changed values are shown in blue-violet
 
-            MessageBox.Show("Profile loaded into the 4 tabs.\n\nNothing has been written yet: press \"SAVE Controller settings\" to apply it to the game.",
+            string note = !knownKbm ? "\n\nThis profile has no keyboard and mouse settings, so the KEYBOARD & MOUSE tab was not changed."
+                        : !knownController ? "\n\nThis profile has only keyboard and mouse settings, so the controller tabs were not changed."
+                        : "";
+            MessageBox.Show("Profile loaded." + note + "\n\nNothing has been written yet: press \"SAVE Controller settings\" to apply it to the game.",
                             "Load Profile", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
