@@ -63,8 +63,8 @@ namespace DDTM_DSFixUI
             KbmA("panelKbm_Target", "NEXT_TARGET", "Next target", "While locked on: switch to the next target. A fast mouse flick does the same.", false, "MOUSE_WHEEL_DOWN"),
             KbmA("panelKbm_Target", "PREVIOUS_TARGET", "Previous target", "While locked on: switch to the previous target.", false, "MOUSE_WHEEL_UP"),
 
-            KbmA("panelKbm_Menus", "MENU_LEFT", "Menu tab left", "Previous tab (LB). Only in the quick menu and the menus opened from it; there the key does nothing else.", false, "A"),
-            KbmA("panelKbm_Menus", "MENU_RIGHT", "Menu tab right", "Next tab (RB). Only in the quick menu and the menus opened from it; there the key does nothing else.", false, "D"),
+            KbmA("panelKbm_Menus", "MENU_LEFT", "Menu tab left", "Previous tab (LB). Only in the quick menu and the menus opened from it; there the key does nothing else.", false, "COMMA"),
+            KbmA("panelKbm_Menus", "MENU_RIGHT", "Menu tab right", "Next tab (RB). Only in the quick menu and the menus opened from it; there the key does nothing else.", false, "PERIOD"),
         };
 
         private static readonly string[] KbmSliderKeys = { "Sensitivity_X", "Sensitivity_Y", "Bow_Sensitivity_X", "Bow_Sensitivity_Y" };

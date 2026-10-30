@@ -47,13 +47,17 @@ namespace DDTM_DSFixUI
             Dictionary<string, string> current;
             try
             {
-                current = ReadDsfixValues("swapConfirmIcons", "swapXYIcons");
+                current = ReadDsfixValues("swapConfirmIcons", "swapXYIcons", "DDTMControllerMappings");
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Could not read DSfix.ini:\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
+
+            // DDTMControllerMappings 1: DSfix takes the in-game button icons from this mapping itself (through
+            // DDTMControllerFix.dll) and does not use swapConfirmIcons / swapXYIcons, so there is nothing to ask
+            if (current.TryGetValue("DDTMControllerMappings", out string ddtmIcons) && ddtmIcons == "1") return;
 
             // a missing key counts as 0 (icons not swapped)
             string curAb = current.TryGetValue("swapConfirmIcons", out string a) ? a : "0";
