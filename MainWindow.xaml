@@ -515,6 +515,8 @@
                             <ComboBoxItem Content="switch"/>
                         </ComboBox>
                     </WrapPanel>
+                    <CheckBox Name="chkDDTMControllerMappings" Content="Button Icons follow DDTMControllerMappings.ini (keyboard / mouse and controller mapping)" Foreground="White" Margin="0,10,0,0" ToolTip="DSfix.ini: DDTMControllerMappings&#x0a;Only works with DDTMControllerFix.dll.&#x0a;Keyboard / mouse: the button prompts and the quick menu LB / RB icons show your keys from DDTMControllerMappings.ini.&#x0a;Controller: the face buttons, LB / RB and LT / RT show the real button mapped to them (for example A = R1 shows RB).&#x0a;While this is on, the two swap options above are not used."/>
+                    <TextBlock Text="Needs DDTMControllerFix.dll. While it is on, the in-game icons switch between your keyboard / mouse keys and the controller icons, and follow your controller button mapping, so the two swap options above are not needed." Foreground="#A8A8A8" FontSize="12" TextWrapping="Wrap" Margin="20,2,0,0"/>
                     
                 </StackPanel>
             </TabItem>

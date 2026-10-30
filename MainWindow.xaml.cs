@@ -425,6 +425,7 @@ namespace DDTM_DSFixUI
                     case "logLevel": SetComboBoxByValue(cmbLogLevel, value); break;
                     case "swapConfirmIcons": chkSwapConfirmIcons.IsChecked = value == "1"; break;
                     case "swapXYIcons": chkSwapXYIcons.IsChecked = value == "1"; break;
+                    case "DDTMControllerMappings": chkDDTMControllerMappings.IsChecked = value == "1"; break;
                     case "disableItemAutoEquip": chkDisableItemAutoEquip.IsChecked = value == "1"; break;
                     case "weaponWearBars": chkDurabilityBars.IsChecked = value == "1"; break;
                     case "bulkItemUse": chkBulkItemUse.IsChecked = value == "1"; break;
@@ -770,6 +771,7 @@ namespace DDTM_DSFixUI
                 $"swapConfirmIcons={(chkSwapConfirmIcons.IsChecked == true ? "1" : "0")}",
                 $"swapXYIcons={(chkSwapXYIcons.IsChecked == true ? "1" : "0")}",
                 $"controllerIcons={GetComboBoxValue(cmbControllerIcons)}",
+                $"DDTMControllerMappings={(chkDDTMControllerMappings.IsChecked == true ? "1" : "0")}",
                 $"disableItemAutoEquip={(chkDisableItemAutoEquip.IsChecked == true ? "1" : "0")}",
                 $"weaponWearBars={(chkDurabilityBars.IsChecked == true ? "1" : "0")}",
                 $"bulkItemUse={(chkBulkItemUse.IsChecked == true ? "1" : "0")}",
@@ -884,6 +886,7 @@ namespace DDTM_DSFixUI
                     case "logLevel": SetComboBoxByValue(cmbLogLevel, value); break;
                     case "swapConfirmIcons": chkSwapConfirmIcons.IsChecked = value == "1"; break;
                     case "swapXYIcons": chkSwapXYIcons.IsChecked = value == "1"; break;
+                    case "DDTMControllerMappings": chkDDTMControllerMappings.IsChecked = value == "1"; break;
                     case "disableItemAutoEquip": chkDisableItemAutoEquip.IsChecked = value == "1"; break;
                     case "weaponWearBars": case "durabilityBars": chkDurabilityBars.IsChecked = value == "1"; break;
                     case "bulkItemUse": chkBulkItemUse.IsChecked = value == "1"; break;
@@ -1014,6 +1017,7 @@ namespace DDTM_DSFixUI
                     case "logLevel": lines[i] = $"logLevel {GetComboBoxValue(cmbLogLevel)}"; break;
                     case "swapConfirmIcons": lines[i] = $"swapConfirmIcons {(chkSwapConfirmIcons.IsChecked == true ? "1" : "0")}"; break;
                     case "swapXYIcons": lines[i] = $"swapXYIcons {(chkSwapXYIcons.IsChecked == true ? "1" : "0")}"; break;
+                    case "DDTMControllerMappings": lines[i] = $"DDTMControllerMappings {(chkDDTMControllerMappings.IsChecked == true ? "1" : "0")}"; break;
                     case "disableItemAutoEquip": lines[i] = $"disableItemAutoEquip {(chkDisableItemAutoEquip.IsChecked == true ? "1" : "0")}"; break;   // never appended
                     case "weaponWearBars": lines[i] = $"weaponWearBars {(chkDurabilityBars.IsChecked == true ? "1" : "0")}"; break;               // never appended
                     case "bulkItemUse": lines[i] = $"bulkItemUse {(chkBulkItemUse.IsChecked == true ? "1" : "0")}"; break;                        // never appended
@@ -1042,7 +1046,8 @@ namespace DDTM_DSFixUI
             var newerChecks = new (string Key, System.Windows.Controls.CheckBox Check)[]
             {
                 ("swapConfirmIcons", chkSwapConfirmIcons),
-                ("swapXYIcons", chkSwapXYIcons)
+                ("swapXYIcons", chkSwapXYIcons),
+                ("DDTMControllerMappings", chkDDTMControllerMappings)
             };
             foreach (var (key, check) in newerChecks)
             {
