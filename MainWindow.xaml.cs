@@ -432,6 +432,10 @@ namespace DDTM_DSFixUI
                     case "standardSoulsBulk": chkStandardSoulsBulk.IsChecked = value == "1"; break;
                     case "humanityBulk": chkHumanityBulk.IsChecked = value == "1"; break;
                     case "covenantOfferings": chkCovenantOfferings.IsChecked = value == "1"; break;
+                    case "WeaponsArmorSort": chkWeaponsArmorSort.IsChecked = value == "1"; break;
+                    case "BottomlessBoxMarkers": chkBottomlessBoxMarkers.IsChecked = value == "1"; break;
+                    case "QuickSelectEstus": chkQuickSelectEstus.IsChecked = value == "1"; break;
+                    case "BonfireCovenants": chkBonfireCovenants.IsChecked = value == "1"; break;
                     case "controllerIcons": if (value.Length > 0) SetComboBoxByValue(cmbControllerIcons, value.ToLowerInvariant()); break;
                 }
             }
@@ -514,6 +518,7 @@ namespace DDTM_DSFixUI
                 cmbLogLevel.SelectedIndex = 0;
                 cmbEnableVsync.SelectedIndex = 1;
                 txtFullscreenHz.Text = GetCurrentRefreshRate().ToString();
+                chkDDTMControllerMappings.IsChecked = true;
 
                 //check borderless
                 if (IsDarkSoulsIniFullscreen()) { chkBorderless.IsChecked = false; } else { chkBorderless.IsChecked = true; }
@@ -778,6 +783,10 @@ namespace DDTM_DSFixUI
                 $"standardSoulsBulk={(chkStandardSoulsBulk.IsChecked == true ? "1" : "0")}",
                 $"humanityBulk={(chkHumanityBulk.IsChecked == true ? "1" : "0")}",
                 $"covenantOfferings={(chkCovenantOfferings.IsChecked == true ? "1" : "0")}",
+                $"WeaponsArmorSort={(chkWeaponsArmorSort.IsChecked == true ? "1" : "0")}",
+                $"BottomlessBoxMarkers={(chkBottomlessBoxMarkers.IsChecked == true ? "1" : "0")}",
+                $"QuickSelectEstus={(chkQuickSelectEstus.IsChecked == true ? "1" : "0")}",
+                $"BonfireCovenants={(chkBonfireCovenants.IsChecked == true ? "1" : "0")}",
 
                 // Keys mappings
                 $"toggleCursorCapture={txtKeyToggleCursorCapture.Text}|{chkKeyToggleCursorCapture.IsChecked}",
@@ -893,6 +902,10 @@ namespace DDTM_DSFixUI
                     case "standardSoulsBulk": chkStandardSoulsBulk.IsChecked = value == "1"; break;
                     case "humanityBulk": chkHumanityBulk.IsChecked = value == "1"; break;
                     case "covenantOfferings": chkCovenantOfferings.IsChecked = value == "1"; break;
+                    case "WeaponsArmorSort": chkWeaponsArmorSort.IsChecked = value == "1"; break;
+                    case "BottomlessBoxMarkers": chkBottomlessBoxMarkers.IsChecked = value == "1"; break;
+                    case "QuickSelectEstus": chkQuickSelectEstus.IsChecked = value == "1"; break;
+                    case "BonfireCovenants": chkBonfireCovenants.IsChecked = value == "1"; break;
                     case "controllerIcons": if (value.Length > 0) SetComboBoxByValue(cmbControllerIcons, value.ToLowerInvariant()); break;
 
                     default:
@@ -1024,6 +1037,10 @@ namespace DDTM_DSFixUI
                     case "standardSoulsBulk": lines[i] = $"standardSoulsBulk {(chkStandardSoulsBulk.IsChecked == true ? "1" : "0")}"; break;      // never appended
                     case "humanityBulk": lines[i] = $"humanityBulk {(chkHumanityBulk.IsChecked == true ? "1" : "0")}"; break;                     // never appended
                     case "covenantOfferings": lines[i] = $"covenantOfferings {(chkCovenantOfferings.IsChecked == true ? "1" : "0")}"; break;       // never appended
+                    case "WeaponsArmorSort": lines[i] = $"WeaponsArmorSort {(chkWeaponsArmorSort.IsChecked == true ? "1" : "0")}"; break;   // never appended
+                    case "BottomlessBoxMarkers": lines[i] = $"BottomlessBoxMarkers {(chkBottomlessBoxMarkers.IsChecked == true ? "1" : "0")}"; break;   // never appended
+                    case "QuickSelectEstus": lines[i] = $"QuickSelectEstus {(chkQuickSelectEstus.IsChecked == true ? "1" : "0")}"; break;   // never appended
+                    case "BonfireCovenants": lines[i] = $"BonfireCovenants {(chkBonfireCovenants.IsChecked == true ? "1" : "0")}"; break;   // never appended
                     case "controllerIcons": if (cmbControllerIcons.SelectedItem != null) lines[i] = $"controllerIcons {GetComboBoxValue(cmbControllerIcons)}"; break;   // never appended: older DSfix.ini files do not have it
                 }
             }

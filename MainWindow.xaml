@@ -226,11 +226,11 @@
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
 
                     <StackPanel Margin="10" >
-                        <CheckBox Name="chkEnableHudMod" Content="Enable HUD Modifications" Foreground="White" ToolTip="Master toggle for HUD Modifications" Checked="chkEnableHudMod_Checked" Unchecked="chkEnableHudMod_Unchecked" IsChecked="True"/>
+                        <CheckBox Name="chkEnableHudMod" Content="Enable HUD Modifications  (You must always keep HUD ON in game options with this feature)" Foreground="White" ToolTip="Master toggle for HUD Modifications" Checked="chkEnableHudMod_Checked" Unchecked="chkEnableHudMod_Unchecked" IsChecked="True"/>
 
                         <Separator x:Name="sep1" Height="26" Background="#FF736554" Margin="0,5"/>
                         <!-- HUD Scaling -->
-                        <TextBlock x:Name="txtblockhud1" Text="HUD Scaling (1.0 = Default | 0.75 = 75% | 0.5 = 50%)                            !In-game HUD option must be ON" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,5,0,5"/>
+                        <TextBlock x:Name="txtblockhud1" Text="HUD Scaling (1.0 = Default | 0.75 = 75% | 0.5 = 50%)" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,5,0,5"/>
                         <Grid x:Name="wrappanelhud1" HorizontalAlignment="Left" Width="560" Margin="0,0,0,5">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="150"/>
@@ -312,11 +312,14 @@
                         <!-- Items & HUD -->
                         <TextBlock Text="HUD &amp; Menu" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,5,0,5"/>
                         <CheckBox Name="chkDurabilityBars" Content="Show weapon durability bars (Dark Souls III Style)" Foreground="White" Margin="0,5,0,0" ToolTip="Thin bar under each weapon slot showing durability left (bottom-left HUD)."/>
+                        <CheckBox Name="chkWeaponsArmorSort" Content="Sort Weapons and Armor lists (Inventory, Equipment and Bottomless Box)" Foreground="White" Margin="0,5,0,0" ToolTip="Sort the Weapons and Armor lists of the Inventory, the Equipment and the Bottomless Box.&#x0a;Values: Game Order, physical, magic, fire, lightning, durability, weight, and in the Bottomless Box also Storage.&#x0a;The choice is remembered in %LOCALAPPDATA%\NBGI\DarkSouls\DSfixSort.ini"/>
+                        <CheckBox Name="chkBottomlessBoxMarkers" Content="Bottomless Box markers (Storage icon on items that are only in the box)" Foreground="White" Margin="0,5,0,0" ToolTip="In the Bottomless Box list, a small chest picture in the top-right corner of an item's picture&#x0a;when nothing of it is held and all of it is in the box."/>
                         <Separator Height="6" Background="#FF736554" Margin="0,15,0,0"/>
 
                         <!-- Bulk item use -->
                         <TextBlock Text="Items" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,15,0,5"/>
                         <CheckBox Name="chkDisableItemAutoEquip" Content="Disable consumables auto-equip (Estus unchanged)" Foreground="White" Margin="0,5,0,0" ToolTip="Consumables you pick up are no longer put into your quick item slots automatically (Estus unchanged)."/>
+                        <CheckBox Name="chkQuickSelectEstus" Content="Quick Select the Estus Flask" Foreground="White" Margin="0,5,0,0" ToolTip="Hold D-pad Down during play to select the Estus Flask in your quick-item slots.&#x0a;A tap still switches to the next item. With DDTM, its SWITCH_ITEM key works the same."/>
                         <CheckBox Name="chkBulkItemUse" Content="Use several of the same item at once (master switch)" Foreground="White" Margin="0,5,0,0" Click="chkBulkItemUse_Click" ToolTip="Use several of the same item at once (master switch).&#x0a;In the pause Inventory menu, using a listed item asks how many to use and uses them all with a single animation.&#x0a;The quick-item button during play behaves as before, and any item that is not listed keeps its normal behaviour, so Boss Souls and Fire Keeper Souls still ask their own Yes/No question.&#x0a;The number offered is never more than you own and never so many that the reward would be lost at the game's limit.&#x0a;Owning only one uses it straight away with no question."/>
                         <TextBlock Text="In the pause Inventory menu, using a listed item asks how many to use and uses them all with a single animation. The groups below only matter when this is on; a group that is off is never touched." Foreground="#FF9A9A9A" FontStyle="Italic" FontSize="12" TextWrapping="Wrap" Margin="20,4,0,0"/>
                         <!-- groups: faded and disabled while the master switch is off -->
@@ -338,6 +341,7 @@
                         <!-- Covenants -->
                         <TextBlock Text="Covenants" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,15,0,5"/>
                         <CheckBox Name="chkCovenantOfferings" Content="Offer several items at once to a covenant" Foreground="White" Margin="0,5,0,0" ToolTip="Offer several at once to a covenant.&#x0a;The &quot;Offer ...?&quot; question at an altar or covenant leader becomes the game's own number picker, and the chosen number of items (or of humanity) is offered in one step.&#x0a;The picker never offers enough to reach the next covenant rank, so the offering that ranks you up is always the game's own single question and its reward arrives exactly as before."/>
+                        <CheckBox Name="chkBonfireCovenants" Content="Bonfire change covenant" Foreground="White" Margin="0,5,0,0" ToolTip="&quot;Enter Covenant&quot; in the bonfire list: switch to a covenant you already joined in this playthrough.&#x0a;Same Yes/No question and result as the leaders (the devotion of the covenant you leave is halved).&#x0a;Broken covenants (leader dead or hostile, banished, ...) are not offered. Resets in NG+."/>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
@@ -515,8 +519,8 @@
                             <ComboBoxItem Content="switch"/>
                         </ComboBox>
                     </WrapPanel>
-                    <CheckBox Name="chkDDTMControllerMappings" Content="Button Icons follow DDTMControllerMappings.ini (keyboard / mouse and controller mapping)" Foreground="White" Margin="0,10,0,0" ToolTip="DSfix.ini: DDTMControllerMappings&#x0a;Only works with DDTMControllerFix.dll.&#x0a;Keyboard / mouse: the button prompts and the quick menu LB / RB icons show your keys from DDTMControllerMappings.ini.&#x0a;Controller: the face buttons, LB / RB and LT / RT show the real button mapped to them (for example A = R1 shows RB).&#x0a;While this is on, the two swap options above are not used."/>
-                    <TextBlock Text="Needs DDTMControllerFix.dll. While it is on, the in-game icons switch between your keyboard / mouse keys and the controller icons, and follow your controller button mapping, so the two swap options above are not needed." Foreground="#A8A8A8" FontSize="12" TextWrapping="Wrap" Margin="20,2,0,0"/>
+                    <CheckBox Name="chkDDTMControllerMappings" Content="Show Keyboard/Mouse alongside Controller icons (Only with DDTMControllerFix.dll)" Foreground="White" Margin="0,10,0,0" ToolTip="DSfix.ini: DDTMControllerMappings&#x0a;Only works with DDTMControllerFix.dll.&#x0a;Keyboard / mouse: the button prompts and the quick menu LB / RB icons show your keys from DDTMControllerMappings.ini.&#x0a;Controller: the face buttons, LB / RB and LT / RT show the real button mapped to them (for example A = R1 shows RB).&#x0a;While this is on, the two swap options above are not used."/>
+                    <TextBlock Text="While it is on, the in-game icons switch between your keyboard / mouse keys and the controller icons, and follow your controller button mapping, so the two swap options above are not needed." Foreground="#A8A8A8" FontSize="12" TextWrapping="Wrap" Margin="20,2,0,0"/>
                     
                 </StackPanel>
             </TabItem>
