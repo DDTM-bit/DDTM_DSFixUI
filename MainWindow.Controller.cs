@@ -238,8 +238,8 @@ namespace DDTM_DSFixUI
         }
 
         // Parses a DDTMControllerMappings.ini (or a profile file with the same format).
-        // The [Keyboard] / [Mouse] sections are skipped: they use some of the same names (KICK, LEAP_ATTACK,
-        // DASH_SPRINT_ONLY) and are read by ReadKbmFile (MainWindow.KeyboardMouse.cs).
+        // The [Keyboard] / [Mouse] sections are skipped: they use some of the same names (KICK, LEAP_ATTACK, and
+        // DASH_SPRINT_ONLY in older files) and are read by ReadKbmFile (MainWindow.KeyboardMouse.cs).
         private static void ReadControllerFile(string path, out Dictionary<string, string> kv,
                                                out List<string> back, out Dictionary<string, string> advOff)
         {
@@ -426,44 +426,7 @@ namespace DDTM_DSFixUI
         // The controller sections are written here; the [Keyboard] / [Mouse] sections by ApplyKbmLines.
         private List<string> BuildControllerIniLines(string[] template)
         {
-            // ---- collect values from the controller sub tabs ----
-            var values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            values["Preset"] = GetSelectedPreset();
-            foreach (string k in MappingKeys) values[k] = GetButton(Ctl<ComboBox>("cmbMap_" + k));
-
-            var backLines = new List<string>();
-            string b1 = GetButton(Ctl<ComboBox>("cmbMap_BACK"));
-            string b2 = GetButton(Ctl<ComboBox>("cmbMap_BACK2"));
-            if (b1 != "NONE") backLines.Add(b1);
-            if (b2 != "NONE" && !string.Equals(b1, b2, StringComparison.OrdinalIgnoreCase)) backLines.Add(b2);
-            if (backLines.Count == 0) backLines.Add("NONE");
-
-            foreach (string k in MacroKeys)
-            {
-                var parts = new List<string>();
-                for (int i = 1; i <= 3; i++)
-                {
-                    string b = GetButton(Ctl<ComboBox>($"cmbMacro_{k}_{i}"));
-                    if (b != "NONE" && !parts.Contains(b)) parts.Add(b);
-                }
-                values[k] = parts.Count == 0 ? "NONE" : string.Join(" + ", parts);
-            }
-
-            foreach (string k in BoolKeys) values[k] = Ctl<CheckBox>("chk_" + k).IsChecked == true ? "TRUE" : "FALSE";
-            foreach (string k in SliderKeys) values[k] = FormatSlider(k, Ctl<Slider>("sld_" + k).Value);
-
-            var advEnabled = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-            foreach (string k in AdvancedKeys)
-            {
-                string text = Ctl<TextBox>("txtAdv_" + k).Text.Trim();
-                if (!int.TryParse(text, NumberStyles.None, CultureInfo.InvariantCulture, out int n) || n < 1)
-                {
-                    MessageBox.Show($"{k} must be a whole number greater than 0.", "Invalid value", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return null;
-                }
-                values[k] = n.ToString(CultureInfo.InvariantCulture);
-                advEnabled[k] = Ctl<CheckBox>("chkAdv_" + k).IsChecked == true;
-            }
+            if (!CollectControllerValues(out var values, out var backLines, out var advEnabled)) return null;
 
             // ---- rewrite the file line by line, keeping every comment ----
             string[] original = template ?? Array.Empty<string>();
@@ -536,6 +499,52 @@ namespace DDTM_DSFixUI
             ApplyKbmLines(output);
 
             return output;
+        }
+
+        // Reads the values of the controller sub tabs (used for DDTMControllerMappings.ini and for Save Profile).
+        // Returns false when a value is invalid (the user was already warned).
+        private bool CollectControllerValues(out Dictionary<string, string> values, out List<string> backLines,
+                                             out Dictionary<string, bool> advEnabled)
+        {
+            values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            values["Preset"] = GetSelectedPreset();
+            foreach (string k in MappingKeys) values[k] = GetButton(Ctl<ComboBox>("cmbMap_" + k));
+
+            backLines = new List<string>();
+            string b1 = GetButton(Ctl<ComboBox>("cmbMap_BACK"));
+            string b2 = GetButton(Ctl<ComboBox>("cmbMap_BACK2"));
+            if (b1 != "NONE") backLines.Add(b1);
+            if (b2 != "NONE" && !string.Equals(b1, b2, StringComparison.OrdinalIgnoreCase)) backLines.Add(b2);
+            if (backLines.Count == 0) backLines.Add("NONE");
+
+            foreach (string k in MacroKeys)
+            {
+                var parts = new List<string>();
+                for (int i = 1; i <= 3; i++)
+                {
+                    string b = GetButton(Ctl<ComboBox>($"cmbMacro_{k}_{i}"));
+                    if (b != "NONE" && !parts.Contains(b)) parts.Add(b);
+                }
+                values[k] = parts.Count == 0 ? "NONE" : string.Join(" + ", parts);
+            }
+
+            foreach (string k in BoolKeys) values[k] = Ctl<CheckBox>("chk_" + k).IsChecked == true ? "TRUE" : "FALSE";
+            foreach (string k in SliderKeys) values[k] = FormatSlider(k, Ctl<Slider>("sld_" + k).Value);
+
+            advEnabled = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            foreach (string k in AdvancedKeys)
+            {
+                string text = Ctl<TextBox>("txtAdv_" + k).Text.Trim();
+                if (!int.TryParse(text, NumberStyles.None, CultureInfo.InvariantCulture, out int n) || n < 1)
+                {
+                    MessageBox.Show($"{k} must be a whole number greater than 0.", "Invalid value", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return false;
+                }
+                values[k] = n.ToString(CultureInfo.InvariantCulture);
+                advEnabled[k] = Ctl<CheckBox>("chkAdv_" + k).IsChecked == true;
+            }
+
+            return true;
         }
 
         private async void ShowControllerSaved()

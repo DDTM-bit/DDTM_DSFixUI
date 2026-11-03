@@ -207,18 +207,9 @@ namespace DDTM_DSFixUI
                 return;
             }
 
-            // use the current .ini as template so the profile keeps all the explanations
-            string[] template = File.Exists(controllerIniPath) ? File.ReadAllLines(controllerIniPath) : Array.Empty<string>();
-            List<string> lines = BuildControllerIniLines(template);
+            // a clean file: only the section names and the settings, no explanations
+            List<string> lines = BuildControllerProfileLines();
             if (lines == null) return;   // invalid value, user already warned
-
-            lines.InsertRange(0, new[]
-            {
-                "# DDTM Controller profile",
-                $"# Saved by DDTM DSFix UI on {DateTime.Now:yyyy-MM-dd HH:mm}",
-                "# Load it with the \"Load Profile\" button in the DDTM Controller tab.",
-                ""
-            });
 
             try
             {
@@ -230,6 +221,52 @@ namespace DDTM_DSFixUI
                 return;
             }
             MessageBox.Show("Profile saved:\n" + dialog.FileName, "Save Profile", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        // A profile is a clean list of the settings: the section names and "NAME = value" lines, nothing else.
+        // It uses the same names and sections as DDTMControllerMappings.ini, so Load Profile reads it with the same
+        // readers, and older profiles (a full copy of the .ini) still load.
+        // A disabled advanced value (RunState_Ms / JumpGuard_Ms) is left out: it loads as disabled.
+        // Returns null when a value is invalid (the user was already warned).
+        private List<string> BuildControllerProfileLines()
+        {
+            if (!CollectControllerValues(out var values, out var backLines, out var advEnabled)) return null;
+            CollectKbmValues(out var keyboard, out var mouse);
+
+            var lines = new List<string> { $"# DDTM Controller profile - DDTM DSFix UI, {DateTime.Now:yyyy-MM-dd HH:mm}" };
+
+            // controller: same order and sections as the .ini (Preset first, outside any section)
+            var order = new List<string> { "Preset" };
+            order.AddRange(MappingKeys);
+            order.Add("BACK");
+            order.AddRange(MacroKeys);
+            order.AddRange(BoolKeys);
+            order.AddRange(SliderKeys);
+            order.AddRange(AdvancedKeys);
+
+            foreach (string section in new[] { "", "Bindings", "Settings", "Advanced" })
+            {
+                var block = new List<string>();
+                foreach (string k in order.Where(name => KeySection(name) == section))
+                {
+                    if (k == "BACK") block.AddRange(backLines.Select(b => "BACK = " + b));
+                    else if (advEnabled.TryGetValue(k, out bool on) && !on) continue;
+                    else block.Add(k + " = " + values[k]);
+                }
+                if (block.Count == 0) continue;
+                lines.Add("");
+                if (section != "") lines.Add("[" + section + "]");
+                lines.AddRange(block);
+            }
+
+            // keyboard and mouse
+            lines.Add("");
+            lines.Add("[Keyboard]");
+            lines.AddRange(keyboard.Select(kv => kv.Key + " = " + kv.Value));
+            lines.Add("");
+            lines.Add("[Mouse]");
+            lines.AddRange(mouse.Select(kv => kv.Key + " = " + kv.Value));
+            return lines;
         }
 
         private void BtnLoadControllerProfile_Click(object sender, RoutedEventArgs e)
@@ -268,9 +305,11 @@ namespace DDTM_DSFixUI
                 return;
             }
 
-            // a profile with only one part (an older profile has no keyboard / mouse) leaves the other part as it is now
+            // a profile with only one part (an older profile has no keyboard / mouse) leaves the other part as it is now.
+            // Keyboard / mouse: older action names are read as the current ones (ReadKbmFile), and a setting the
+            // profile does not have yet (newer than the profile) keeps its current value.
             if (knownController) ApplyControllerValues(kv, back, advOff);
-            if (knownKbm) ApplyKbmValues(kb, mouse, hasKeyboard);
+            if (knownKbm) ApplyKbmValues(kb, mouse, hasKeyboard, keepMissing: true);
             ValidateAllControls();   // changed values are shown in blue-violet
 
             string note = !knownKbm ? "\n\nThis profile has no keyboard and mouse settings, so the KEYBOARD & MOUSE tab was not changed."

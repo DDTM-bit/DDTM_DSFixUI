@@ -10,7 +10,11 @@ namespace DDTM_DSFixUI
 {
     // "DDTM Controller" tab > "KEYBOARD & MOUSE" sub tab: the [Keyboard] and [Mouse] sections of
     // DDTMControllerMappings.ini. Kept apart from the controller sections: those have actions with the same
-    // names (KICK, LEAP_ATTACK, DASH_SPRINT_ONLY), so every read / write here only looks inside [Keyboard] / [Mouse].
+    // names (KICK, LEAP_ATTACK, and in older files DASH_SPRINT_ONLY), so every read / write here only looks inside
+    // [Keyboard] / [Mouse].
+    //
+    // Older [Keyboard] action names (older dll versions and older profiles) are read under their current names
+    // (KbmRenamedKeys), and an old-name line in DDTMControllerMappings.ini gets its current name when saving.
     //
     // How a key is assigned: click a box (it turns orange), then press a key, click a mouse button on the box or
     // turn the mouse wheel over the box. Clicking anywhere else cancels. The x button clears the action (NONE).
@@ -37,9 +41,11 @@ namespace DDTM_DSFixUI
             KbmA("panelKbm_Movement", "MOVE_LEFT", "Move left", "Like the left stick pushed fully left.", false, "A"),
             KbmA("panelKbm_Movement", "MOVE_RIGHT", "Move right", "Like the left stick pushed fully right.", false, "D"),
             KbmA("panelKbm_Movement", "WALK", "Walk", "Hold together with a movement key to walk instead of run.", false, "LALT"),
-            KbmA("panelKbm_Movement", "DASH_ROLL_BACKSTEP", "Dash / roll / backstep", "Tap to roll (backstep when standing), hold to sprint. It never jumps. In menus it goes back (B on a controller).", false, "SPACE"),
+            KbmA("panelKbm_Movement", "DASH_ROLL_BACKSTEP_JUMP", "Dash / roll / backstep / jump", "Tap to roll (backstep when standing), hold to sprint, and it can jump as in the normal game (unless the mute option below is on). In menus it goes back (B on a controller).", false, "SPACE"),
             KbmA("panelKbm_Movement", "JUMP", "Jump", "Jumps while moving, like the controller's JUMP_ONLY macro.", false, "F"),
-            KbmA("panelKbm_Movement", "DASH_SPRINT_ONLY", "Sprint (toggle)", "Press once to sprint while moving. It stops when you stop moving, attack or open a menu. It never rolls or jumps.", false, "LSHIFT"),
+            KbmA("panelKbm_Movement", "DASH_SPRINT_ONLY_Key", "Sprint only", "Hold to sprint while moving (not walking). Taps can never roll, and pressing it again right after cannot jump. Standing still or walking it does nothing.", false, "LSHIFT"),
+            KbmA("panelKbm_Movement", "AUTO_RUN_Key", "Auto-sprint (toggle)", "Press once to sprint while moving. It stops when you stop moving, attack or open a menu. It never rolls or jumps.", false, "NONE"),
+            KbmA("panelKbm_Movement", "ROLL_ONLY_Key", "Roll only", "Always rolls, never sprints, however long you hold it. Standing still it backsteps, as the game normally does.", false, "NONE"),
 
             KbmA("panelKbm_Combat", "LIGHT_ATTACK", "Right weapon attack", "Light attack with the right hand (RB on a controller).", true, "MOUSE_LEFT"),
             KbmA("panelKbm_Combat", "HEAVY_ATTACK", "Right weapon heavy attack", "Heavy attack with the right hand (RT on a controller).", true, "MOUSE_RIGHT"),
@@ -66,6 +72,25 @@ namespace DDTM_DSFixUI
             KbmA("panelKbm_Menus", "MENU_LEFT", "Menu tab left", "Previous tab (LB). Only in the quick menu and the menus opened from it; there the key does nothing else.", false, "COMMA"),
             KbmA("panelKbm_Menus", "MENU_RIGHT", "Menu tab right", "Next tab (RB). Only in the quick menu and the menus opened from it; there the key does nothing else.", false, "PERIOD"),
         };
+
+        // [Keyboard] on / off switch: TRUE = DASH_ROLL_BACKSTEP_JUMP can no longer jump by accident (JUMP still jumps).
+        // Its checkbox is built in code, right under the DASH_ROLL_BACKSTEP_JUMP row.
+        private const string KbmMuteJumpKey = "MUTE_JUMP_FROM_Key";
+        private const string KbmMuteJumpAfter = "DASH_ROLL_BACKSTEP_JUMP";
+        private CheckBox kbmMuteJumpCheck = null!;
+
+        // Older [Keyboard] action names -> current names
+        private static readonly Dictionary<string, string> KbmRenamedKeys = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["DASH_ROLL_BACKSTEP"] = "DASH_ROLL_BACKSTEP_JUMP",
+            ["DASH_SPRINT_ONLY"] = "DASH_SPRINT_ONLY_Key",
+            ["AUTO_RUN"] = "AUTO_RUN_Key",
+            ["ROLL_ONLY"] = "ROLL_ONLY_Key",
+        };
+
+        private static bool KbmIsTrue(string s) =>
+            s.Equals("TRUE", StringComparison.OrdinalIgnoreCase) || s == "1"
+            || s.Equals("YES", StringComparison.OrdinalIgnoreCase) || s.Equals("ON", StringComparison.OrdinalIgnoreCase);
 
         private static readonly string[] KbmSliderKeys = { "Sensitivity_X", "Sensitivity_Y", "Bow_Sensitivity_X", "Bow_Sensitivity_Y" };
         private static readonly string[] KbmBoolKeys = { "Invert_X", "Invert_Y" };
@@ -158,6 +183,21 @@ namespace DDTM_DSFixUI
                 row.Children.Add(help);
 
                 Ctl<StackPanel>(act.Panel).Children.Add(row);
+
+                // MUTE_JUMP_FROM_Key: right under the key it is about, lined up with the key boxes
+                if (act.Key == KbmMuteJumpAfter)
+                {
+                    kbmMuteJumpCheck = new CheckBox
+                    {
+                        Content = "Mute jump from this key (" + KbmMuteJumpKey + ")",
+                        Foreground = Brushes.White,
+                        Margin = new Thickness(230, 2, 0, 6),
+                        ToolTip = "ON: Dash / roll / backstep / jump can no longer jump by accident (use the Jump key instead).\n" +
+                                  "OFF: it behaves as in the normal game, jumps included.\n" +
+                                  "In DDTMControllerMappings.ini: " + KbmMuteJumpKey
+                    };
+                    Ctl<StackPanel>(act.Panel).Children.Add(kbmMuteJumpCheck);
+                }
             }
 
             // a click anywhere outside the waiting box cancels the wait
@@ -288,11 +328,13 @@ namespace DDTM_DSFixUI
         // the dll uses its defaults; with one, a missing action has no key, exactly like the dll).
         // An action written on several lines (two different keys): the first line is shown here, the other lines
         // are kept in the file when saving.
+        // An older action name (KbmRenamedKeys) is read as its current name; when a file has both, the current name wins.
         private static void ReadKbmFile(string path, out Dictionary<string, string> kb, out Dictionary<string, string> mouse, out bool hasKeyboard)
         {
             kb = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             mouse = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             hasKeyboard = false;
+            var fromOldName = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             string section = "";
             foreach (string line in File.ReadAllLines(path))
             {
@@ -308,41 +350,66 @@ namespace DDTM_DSFixUI
                 if (eq <= 0) continue;
                 string key = t.Substring(0, eq).Trim();
                 string val = t.Substring(eq + 1).Trim();
-                if (section.Equals("[Keyboard]", StringComparison.OrdinalIgnoreCase)) { if (!kb.ContainsKey(key)) kb[key] = val; }
+                if (section.Equals("[Keyboard]", StringComparison.OrdinalIgnoreCase))
+                {
+                    bool oldName = KbmRenamedKeys.TryGetValue(key, out string? current);
+                    if (oldName) key = current!;
+                    if (!kb.ContainsKey(key)) { kb[key] = val; if (oldName) fromOldName.Add(key); }
+                    else if (!oldName && fromOldName.Remove(key)) kb[key] = val;   // the current name wins over an older one
+                }
                 else if (section.Equals("[Mouse]", StringComparison.OrdinalIgnoreCase)) { if (!mouse.ContainsKey(key)) mouse[key] = val; }
             }
         }
 
-        // Puts values into the sub tab (used by Load, Load defaults and Load Profile)
-        private void ApplyKbmValues(Dictionary<string, string> kb, Dictionary<string, string> mouse, bool hasKeyboard)
+        // Puts values into the sub tab (used by Load, Load defaults and Load Profile).
+        // keepMissing (Load Profile): a setting the file does not have keeps its current value in the tab,
+        // so an older profile only changes the settings it knows.
+        private void ApplyKbmValues(Dictionary<string, string> kb, Dictionary<string, string> mouse, bool hasKeyboard, bool keepMissing = false)
         {
             CancelKeyCapture();
             foreach (KbmAction act in KbmActions)
             {
-                string v = kb.TryGetValue(act.Key, out string? val) ? val : (hasKeyboard ? "NONE" : act.Default);
+                if (!kb.TryGetValue(act.Key, out string? v))
+                {
+                    if (keepMissing) continue;
+                    v = hasKeyboard ? "NONE" : act.Default;
+                }
                 string[] parts = v.Split('+').Select(p => p.Trim()).Where(p => p.Length > 0 && !p.Equals("NONE", StringComparison.OrdinalIgnoreCase)).ToArray();
                 act.Box1.Text = parts.Length > 0 ? parts[0].ToUpperInvariant() : "";
                 act.Box2.Text = act.Combo && parts.Length > 1 ? parts[1].ToUpperInvariant() : "";
             }
+            if (kb.TryGetValue(KbmMuteJumpKey, out string? mute)) kbmMuteJumpCheck.IsChecked = KbmIsTrue(mute);
+            else if (!keepMissing) kbmMuteJumpCheck.IsChecked = false;   // default FALSE
 
             foreach (string k in KbmSliderKeys)
             {
+                if (!mouse.TryGetValue(k, out string? s))
+                {
+                    if (keepMissing) continue;
+                    s = KbmMouseDefaults[k];
+                }
                 var sld = Ctl<Slider>("sldKbm_" + k);
-                string s = mouse.TryGetValue(k, out string? mv) ? mv : KbmMouseDefaults[k];
                 if (!double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out double d) || d <= 0)
                     d = double.Parse(KbmMouseDefaults[k], CultureInfo.InvariantCulture);
                 sld.Value = Math.Max(sld.Minimum, Math.Min(sld.Maximum, d));
             }
             foreach (string k in KbmBoolKeys)
             {
-                string s = mouse.TryGetValue(k, out string? mv) ? mv : KbmMouseDefaults[k];
-                Ctl<CheckBox>("chkKbm_" + k).IsChecked = s.Equals("TRUE", StringComparison.OrdinalIgnoreCase) || s == "1"
-                                                         || s.Equals("YES", StringComparison.OrdinalIgnoreCase) || s.Equals("ON", StringComparison.OrdinalIgnoreCase);
+                if (!mouse.TryGetValue(k, out string? s))
+                {
+                    if (keepMissing) continue;
+                    s = KbmMouseDefaults[k];
+                }
+                Ctl<CheckBox>("chkKbm_" + k).IsChecked = KbmIsTrue(s);
             }
         }
 
-        private void ApplyKbmDefaults() =>
+        private void ApplyKbmDefaults()
+        {
             ApplyKbmValues(new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase), new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase), false);
+            kbmMuteJumpCheck.IsChecked = true;
+        }
+            
 
         // ------------------------------------------------------------------
         //  Write: updates the [Keyboard] / [Mouse] lines in 'lines' (the controller lines are already done)
@@ -357,22 +424,50 @@ namespace DDTM_DSFixUI
             return b.Length == 0 ? a : a + " + " + b;
         }
 
-        private void ApplyKbmLines(List<string> lines)
+        // The values of the sub tab, in order: [Keyboard] (every action, MUTE_JUMP_FROM_Key right after the key it is
+        // about) and [Mouse]. Used for DDTMControllerMappings.ini and for Save Profile.
+        private void CollectKbmValues(out List<KeyValuePair<string, string>> keyboard, out List<KeyValuePair<string, string>> mouse)
         {
             CancelKeyCapture();
-            var values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            foreach (KbmAction act in KbmActions) values[act.Key] = KbmValue(act);
-            var mouseValues = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            keyboard = new List<KeyValuePair<string, string>>();
+            foreach (KbmAction act in KbmActions)
+            {
+                keyboard.Add(new KeyValuePair<string, string>(act.Key, KbmValue(act)));
+                if (act.Key == KbmMuteJumpAfter)
+                    keyboard.Add(new KeyValuePair<string, string>(KbmMuteJumpKey, kbmMuteJumpCheck.IsChecked == true ? "TRUE" : "FALSE"));
+            }
+            mouse = new List<KeyValuePair<string, string>>();
             foreach (string k in KbmSliderKeys)
-                mouseValues[k] = Math.Round(Ctl<Slider>("sldKbm_" + k).Value, 2).ToString("0.0#", CultureInfo.InvariantCulture);
+                mouse.Add(new KeyValuePair<string, string>(k, Math.Round(Ctl<Slider>("sldKbm_" + k).Value, 2).ToString("0.0#", CultureInfo.InvariantCulture)));
             foreach (string k in KbmBoolKeys)
-                mouseValues[k] = Ctl<CheckBox>("chkKbm_" + k).IsChecked == true ? "TRUE" : "FALSE";
+                mouse.Add(new KeyValuePair<string, string>(k, Ctl<CheckBox>("chkKbm_" + k).IsChecked == true ? "TRUE" : "FALSE"));
+        }
+
+        private void ApplyKbmLines(List<string> lines)
+        {
+            CollectKbmValues(out var keyboardList, out var mouseList);
+            var values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var kv in keyboardList) values[kv.Key] = kv.Value;
+            var mouseValues = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var kv in mouseList) mouseValues[kv.Key] = kv.Value;
 
             // No [Keyboard] section yet (file from an older dll): add the same section the dll writes, with its help text.
             if (!lines.Any(l => l.Trim().Equals("[Keyboard]", StringComparison.OrdinalIgnoreCase)))
                 lines.AddRange(KbmDefaultSection.Replace("\r\n", "\n").TrimEnd('\n').Split('\n'));
             if (!lines.Any(l => l.Trim().Equals("[Mouse]", StringComparison.OrdinalIgnoreCase)))
                 lines.Add("[Mouse]");
+
+            // the [Keyboard] names already in the file: an old-name line is renamed only when its current name is not there too
+            var keyboardNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            string sec = "";
+            foreach (string line in lines)
+            {
+                string t = line.Trim();
+                if (t.StartsWith("[")) { sec = t; continue; }
+                int eq = t.IndexOf('=');
+                if (sec.Equals("[Keyboard]", StringComparison.OrdinalIgnoreCase) && !t.StartsWith("#") && eq > 0)
+                    keyboardNames.Add(t.Substring(0, eq).Trim());
+            }
 
             var written = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             string section = "";
@@ -385,20 +480,33 @@ namespace DDTM_DSFixUI
                 if (eq <= 0) continue;
                 string key = t.Substring(0, eq).Trim();
                 bool kbSection = section.Equals("[Keyboard]", StringComparison.OrdinalIgnoreCase);
+
+                // older name (for example DASH_ROLL_BACKSTEP): written with its current name
+                bool renamed = false;
+                if (kbSection && KbmRenamedKeys.TryGetValue(key, out string? current) && !keyboardNames.Contains(current))
+                {
+                    key = current;
+                    renamed = true;
+                }
+
                 var dict = kbSection ? values : mouseValues;
                 if (!dict.TryGetValue(key, out string? v)) continue;           // unknown line: kept as it is
-                string tag = (kbSection ? "K:" : "M:") + key;
-                if (written.Contains(tag)) continue;                           // a second key for the same action: kept
-                string realKey = kbSection ? KbmActions.First(a => a.Key.Equals(key, StringComparison.OrdinalIgnoreCase)).Key
-                                           : KbmSliderKeys.Concat(KbmBoolKeys).First(m => m.Equals(key, StringComparison.OrdinalIgnoreCase));
+                string realKey = dict.Keys.First(k => k.Equals(key, StringComparison.OrdinalIgnoreCase));
+                string tag = (kbSection ? "K:" : "M:") + realKey;
+                if (written.Contains(tag))
+                {
+                    // a second key for the same action: kept (an older name gets the current one, the key stays)
+                    if (renamed) lines[i] = realKey + " = " + t.Substring(eq + 1).Trim();
+                    continue;
+                }
                 lines[i] = realKey + " = " + v;
                 written.Add(tag);
             }
 
-            foreach (KbmAction act in KbmActions)
-                if (!written.Contains("K:" + act.Key)) InsertIntoSection(lines, "Keyboard", act.Key + " = " + values[act.Key]);
-            foreach (string k in KbmSliderKeys.Concat(KbmBoolKeys))
-                if (!written.Contains("M:" + k)) InsertIntoSection(lines, "Mouse", k + " = " + mouseValues[k]);
+            foreach (var kv in keyboardList)
+                if (!written.Contains("K:" + kv.Key)) InsertIntoSection(lines, "Keyboard", kv.Key + " = " + kv.Value);
+            foreach (var kv in mouseList)
+                if (!written.Contains("M:" + kv.Key)) InsertIntoSection(lines, "Mouse", kv.Key + " = " + kv.Value);
         }
 
         // The section DDTMControllerFix.dll adds to the .ini (same text), used when the file has none yet.
@@ -438,48 +546,23 @@ namespace DDTM_DSFixUI
 #   Mouse        MOUSE_LEFT, MOUSE_RIGHT, MOUSE_MIDDLE, MOUSE_4, MOUSE_5,
 #                MOUSE_WHEEL_UP, MOUSE_WHEEL_DOWN
 #
-# In menus: only INTERACT, DASH_ROLL_BACKSTEP, USE_ITEM, TWO_HAND, MENU,
+# In menus: only INTERACT, DASH_ROLL_BACKSTEP_JUMP, USE_ITEM, TWO_HAND, MENU,
 # GESTURES, MENU_LEFT and MENU_RIGHT work, and the mouse works as in the
 # normal game. These keys always work in menus, whatever is set here:
 #   ENTER = confirm, BACKSPACE = back, ARROW KEYS = move through the items,
 #   ESC = close the menu (like START).
-# With DSfix: if you turn the HUD off in the game options, also set
-# enableHudMod 0 in DSfix.ini, or mouse clicks land in the wrong place.
+# With DSfix: if you turn the HUD off in the game options, also disable
+# HUD mod in DSfix, or mouse clicks land in the wrong place.
 # With a bow or crossbow two-handed, and while aiming: MOUSE_LEFT shoots and
 # MOUSE_RIGHT changes the arrow type, whatever is written here. While aiming,
 # the mouse wheel zooms.
 [Keyboard]
 
-# One key only:
+#============One key only============
 MOVE_FORWARD = W
 MOVE_BACKWARD = S
 MOVE_LEFT = A
 MOVE_RIGHT = D
-# Hold together with a movement key to walk.
-WALK = LALT
-# Roll, backstep, hold to sprint. It never jumps.
-DASH_ROLL_BACKSTEP = SPACE
-# Jumps while moving.
-JUMP = F
-# Press once to sprint while moving. It stops when you stop moving, attack
-# or open a menu. It never rolls or jumps.
-DASH_SPRINT_ONLY = LSHIFT
-
-# One key or a combination of two:
-SWITCH_LEFT_WEAPON = 1
-SWITCH_RIGHT_WEAPON = 2
-SWITCH_ITEM = 3
-SWITCH_MAGIC = 4
-LIGHT_ATTACK = MOUSE_LEFT
-HEAVY_ATTACK = MOUSE_RIGHT
-BLOCK = LCTRL
-PARRY = Q
-# Instant kick and instant jumping heavy attack (no flick needed),
-# for example KICK = X  or  KICK = LALT + MOUSE_LEFT
-KICK = NONE
-LEAP_ATTACK = NONE
-
-# One key only:
 INTERACT = E
 USE_ITEM = R
 TWO_HAND = T
@@ -488,20 +571,57 @@ GESTURES = G
 LOCK_ON = MOUSE_MIDDLE
 NEXT_TARGET = MOUSE_WHEEL_DOWN
 PREVIOUS_TARGET = MOUSE_WHEEL_UP
+WALK = LALT
+DASH_ROLL_BACKSTEP_JUMP = SPACE
+
+# TRUE = DASH_ROLL_BACKSTEP_JUMP can no longer jump by accident (use JUMP instead).
+# FALSE = DASH_ROLL_BACKSTEP_JUMP behaves as in the normal game, jumps included.
+MUTE_JUMP_FROM_Key = FALSE
+
+# Jumps while moving.
+JUMP = F
+
+# =====One key or a combination of two=====
+SWITCH_LEFT_WEAPON = 1
+SWITCH_RIGHT_WEAPON = 2
+SWITCH_ITEM = 3
+SWITCH_MAGIC = 4
+LIGHT_ATTACK = MOUSE_LEFT
+HEAVY_ATTACK = MOUSE_RIGHT
+BLOCK = LCTRL
+PARRY = Q
+
+# ============Special commands===========
+# Hold to sprint while moving (not walking). Taps can never roll, and pressing
+# it again right after cannot jump. Standing still or walking it does nothing.
+DASH_SPRINT_ONLY_Key = LSHIFT
+
+# Toggle auto-sprint: press once to sprint while moving. It stops when you
+# stop moving, attack or open a menu. It never rolls or jumps.
+AUTO_RUN_Key = C
+
+# Always rolls, never sprints, however long you hold it. Standing still it
+# backsteps, as the game normally does.
+ROLL_ONLY_Key = V
+
+# Instant kick and instant jumping heavy attack (no flick needed)
+KICK = SPACE + MOUSE_LEFT
+LEAP_ATTACK = SPACE + MOUSE_RIGHT
 
 # Only in the quick menu and the menus opened from it (inventory,
 # equipment, status...): change the tab, like LB / RB on the controller.
 # There these keys do nothing else; in the game they keep their normal job.
-MENU_LEFT = Q
-MENU_RIGHT = E
+MENU_LEFT = COMMA
+MENU_RIGHT = PERIOD
+
 
 [Mouse]
 # 1.0 = normal. 2.0 = twice as fast. 0.5 = half speed.
 Sensitivity_X = 1.0
 Sensitivity_Y = 1.0
 # Used while aiming with a bow or crossbow.
-Bow_Sensitivity_X = 1.0
-Bow_Sensitivity_Y = 1.0
+Bow_Sensitivity_X = 0.5
+Bow_Sensitivity_Y = 0.5
 # TRUE turns the direction around.
 Invert_X = FALSE
 Invert_Y = FALSE
