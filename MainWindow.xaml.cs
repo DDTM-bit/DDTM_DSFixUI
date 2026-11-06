@@ -379,6 +379,8 @@ namespace DDTM_DSFixUI
                     case "dofBlurAmount": SetComboBoxByValue(cmbDofBlurAmount, value); break;
                     case "filteringOverride": SetComboBoxByValue(cmbFilteringOverride, value); break;
                     case "sharpenStrength": SetSliderByValue(sldSharpenStrength, value); break;
+                    case "cameraDistance": SetSliderByValue(sldCameraDistance, value); break;
+                    case "cameraDistanceLockOn": chkKeepLockOnDistance.IsChecked = value == "0"; break;   // checked = 0 (vanilla lock-on distance)
                     case "unlockFPS": chkUnlockFPS.IsChecked = value == "1"; break;
                     case "FPSlimit": txtFpsLimit.Text = value; break;
                     case "FPSthreshold": txtFpsThreshold.Text = value; break;
@@ -474,6 +476,7 @@ namespace DDTM_DSFixUI
                     case "reloadSSAOEffect": txtKeyReloadSSAO.Text = key; chkKeyReloadSSAO.IsChecked = isEnabled; break;
                     case "togglePaused": txtKeyTogglePaused.Text = key; chkKeyTogglePaused.IsChecked = isEnabled; break;
                     case "toggleSharpen": txtKeyToggleSharpen.Text = key; chkKeyToggleSharpen.IsChecked = isEnabled; break;
+                    case "toggleCameraDistance": txtKeyToggleCameraDistance.Text = key; chkKeyToggleCameraDistance.IsChecked = isEnabled; break;
                 }
             }
             SnapshotCurrentValues(this);
@@ -497,6 +500,7 @@ namespace DDTM_DSFixUI
                 cmbSsaoStrength.SelectedIndex = 2; // Medium
                 cmbSsaoScale.SelectedIndex = 0; //High quality;
                 sldSharpenStrength.Value = 0;
+                sldCameraDistance.Value = 1.0;   // vanilla camera distance
                 chkDisableCursor.IsChecked = true;
                 chkEnableBackups.IsChecked = true;
                 txtBackupInterval.Text = "1400";
@@ -636,6 +640,18 @@ namespace DDTM_DSFixUI
             return int.TryParse(txtFullscreenHz.Text.Trim(), out int hz) && hz > 0 ? hz.ToString() : "0";
         }
 
+        // ---- Camera (Graphics tab) ----
+        // cameraDistance: one decimal, like the DSfix.ini default ("1.0")
+        private string GetCameraDistanceValue() =>
+            Math.Round(sldCameraDistance.Value, 1).ToString("0.0", CultureInfo.InvariantCulture);
+
+        // "Keep Lock On Distance" only matters when the camera distance is changed: disabled (faded) at 1.0
+        private void sldCameraDistance_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (chkKeepLockOnDistance == null) return;   // still building the window
+            chkKeepLockOnDistance.IsEnabled = Math.Abs(sldCameraDistance.Value - 1.0) > 0.001;
+        }
+
         // ---- Quick Save Feature (Backups tab) ----
         // quickSaveKey: an empty box falls back to the DSfix default
         private string GetQuickSaveKeyValue()
@@ -729,6 +745,8 @@ namespace DDTM_DSFixUI
                 $"dofBlurAmount={GetComboBoxValue(cmbDofBlurAmount)}",
                 $"filteringOverride={GetComboBoxValue(cmbFilteringOverride)}",
                 $"sharpenStrength={GetSliderValue(sldSharpenStrength)}",
+                $"cameraDistance={GetCameraDistanceValue()}",
+                $"cameraDistanceLockOn={(chkKeepLockOnDistance.IsChecked == true ? "0" : "1")}",
                 $"unlockFPS={(chkUnlockFPS.IsChecked == true ? "1" : "0")}",
                 $"FPSlimit={txtFpsLimit.Text}",
                 $"FPSthreshold={txtFpsThreshold.Text}",
@@ -801,7 +819,8 @@ namespace DDTM_DSFixUI
                 $"toggle30FPSLimit={txtKeyToggle30FPSLimit.Text}|{chkKeyToggle30FPSLimit.IsChecked}",
                 $"reloadSSAOEffect={txtKeyReloadSSAO.Text}|{chkKeyReloadSSAO.IsChecked}",
                 $"togglePaused={txtKeyTogglePaused.Text}|{chkKeyTogglePaused.IsChecked}",
-                $"toggleSharpen={txtKeyToggleSharpen.Text}|{chkKeyToggleSharpen.IsChecked}"
+                $"toggleSharpen={txtKeyToggleSharpen.Text}|{chkKeyToggleSharpen.IsChecked}",
+                $"toggleCameraDistance={txtKeyToggleCameraDistance.Text}|{chkKeyToggleCameraDistance.IsChecked}"
             };
 
             string localConfigPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DDTM_DSFixUI_LocalConfig.txt");
@@ -849,6 +868,8 @@ namespace DDTM_DSFixUI
                     case "dofBlurAmount": SetComboBoxByValue(cmbDofBlurAmount, value); break;
                     case "filteringOverride": SetComboBoxByValue(cmbFilteringOverride, value); break;
                     case "sharpenStrength": SetSliderByValue(sldSharpenStrength, value); break;
+                    case "cameraDistance": SetSliderByValue(sldCameraDistance, value); break;
+                    case "cameraDistanceLockOn": chkKeepLockOnDistance.IsChecked = value == "0"; break;   // checked = 0 (vanilla lock-on distance)
                     case "unlockFPS": chkUnlockFPS.IsChecked = value == "1"; break;
                     case "FPSlimit": txtFpsLimit.Text = value; break;
                     case "FPSthreshold": txtFpsThreshold.Text = value; break;
@@ -931,6 +952,7 @@ namespace DDTM_DSFixUI
                                 case "reloadSSAOEffect": txtKeyReloadSSAO.Text = vkKey; chkKeyReloadSSAO.IsChecked = isChecked; break;
                                 case "togglePaused": txtKeyTogglePaused.Text = vkKey; chkKeyTogglePaused.IsChecked = isChecked; break;
                                 case "toggleSharpen": txtKeyToggleSharpen.Text = vkKey; chkKeyToggleSharpen.IsChecked = isChecked; break;
+                                case "toggleCameraDistance": txtKeyToggleCameraDistance.Text = vkKey; chkKeyToggleCameraDistance.IsChecked = isChecked; break;
                             }
                         }
                         break;
@@ -984,6 +1006,8 @@ namespace DDTM_DSFixUI
                     case "dofBlurAmount": lines[i] = $"dofBlurAmount {GetComboBoxValue(cmbDofBlurAmount)}"; break;
                     case "filteringOverride": lines[i] = $"filteringOverride {GetComboBoxValue(cmbFilteringOverride)}"; break;
                     case "sharpenStrength": lines[i] = $"sharpenStrength {GetSliderValue(sldSharpenStrength)}"; break;
+                    case "cameraDistance": lines[i] = $"cameraDistance {GetCameraDistanceValue()}"; break;   // never appended
+                    case "cameraDistanceLockOn": lines[i] = $"cameraDistanceLockOn {(chkKeepLockOnDistance.IsChecked == true ? "0" : "1")}"; break;   // never appended
                     case "unlockFPS": lines[i] = $"unlockFPS {(chkUnlockFPS.IsChecked == true ? "1" : "0")}"; break;
                     case "FPSlimit": lines[i] = $"FPSlimit {txtFpsLimit.Text}"; break;
                     case "FPSthreshold": lines[i] = $"FPSthreshold {txtFpsThreshold.Text}"; break;
@@ -1102,7 +1126,8 @@ namespace DDTM_DSFixUI
                     { "toggle30FPSLimit", (txtKeyToggle30FPSLimit.Text, chkKeyToggle30FPSLimit.IsChecked == true) },
                     { "reloadSSAOEffect", (txtKeyReloadSSAO.Text, chkKeyReloadSSAO.IsChecked == true) },
                     { "togglePaused", (txtKeyTogglePaused.Text, chkKeyTogglePaused.IsChecked == true) },
-                    { "toggleSharpen", (txtKeyToggleSharpen.Text, chkKeyToggleSharpen.IsChecked == true) }
+                    { "toggleSharpen", (txtKeyToggleSharpen.Text, chkKeyToggleSharpen.IsChecked == true) },
+                    { "toggleCameraDistance", (txtKeyToggleCameraDistance.Text, chkKeyToggleCameraDistance.IsChecked == true) }
                 };
 
                 string[] keysLines = File.ReadAllLines(dsfixKeysPath);
@@ -1288,6 +1313,7 @@ namespace DDTM_DSFixUI
                 txtKeyReloadSSAO.Text = "VK_NUMPAD5";
                 txtKeyTogglePaused.Text = "VK_F10";
                 txtKeyToggleSharpen.Text = "VK_F4";
+                txtKeyToggleCameraDistance.Text = "VK_F3";
                 ValidateAllControls();
             }
         }

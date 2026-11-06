@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DDTM_DSFixUI"
         mc:Ignorable="d"
-        Title="DDTM DSFix 3.0 UI SETTINGS" Height="860" Width="1000" WindowStartupLocation="CenterScreen" Icon="icofdsfix3.ico">
+        Title="DDTM DSFix 3.0 UI SETTINGS    V2.6.0" Height="882" Width="1000" WindowStartupLocation="CenterScreen" Icon="icofdsfix3.ico">
 
     <Window.Resources>
         <!-- Dark Souls Theme Styles -->
@@ -143,17 +143,57 @@
                             </ComboBox>
                         </WrapPanel>
                         <Separator Height="6" Background="#FF736554" Margin="0,10,0,0"/>
-                        <!-- Sharpening -->
-                        <TextBlock Text="Sharpening" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,15,0,5"/>
-                        <Grid HorizontalAlignment="Left" Width="560" Margin="0,0,0,5">
+                        <!-- Sharpening (left half) and Camera (right half) on one row -->
+                        <Grid Margin="0,0,0,5">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="150"/>
                                 <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="55"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <Label Grid.Column="0" Content="Sharpen Strength:" VerticalAlignment="Center" ToolTip="for the 3D image after anti-aliasing (the HUD and menus are not sharpened)."/>
-                            <Slider Grid.Column="1" Name="sldSharpenStrength" Minimum="0" Maximum="1" Value="0" TickFrequency="0.05" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Foreground="White" VerticalAlignment="Center" Margin="5,4" Tag="{Binding ElementName=valSharpenStrength}" ToolTip="for the 3D image after anti-aliasing (the HUD and menus are not sharpened)."/>
-                            <TextBlock Grid.Column="2" Name="valSharpenStrength" Text="{Binding Value, ElementName=sldSharpenStrength, StringFormat=F2, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,5,0"/>
+
+                            <!-- Sharpening -->
+                            <Border BorderBrush="#FF7F7F7F" BorderThickness="0,0,2,0" Grid.ColumnSpan="2" Margin="0,0,5,-16">
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Sharpening" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,15,0,5"/>
+                                    <Grid Width="433">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="135"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="45"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Grid.Column="0" Content="Sharpen Strength:" VerticalAlignment="Center" ToolTip="for the 3D image after anti-aliasing (the HUD and menus are not sharpened)."/>
+                                        <Slider Grid.Column="1" Name="sldSharpenStrength" Minimum="0" Maximum="1" Value="0" TickFrequency="0.05" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Foreground="White" VerticalAlignment="Center" Margin="5,4" Tag="{Binding ElementName=valSharpenStrength}" ToolTip="for the 3D image after anti-aliasing (the HUD and menus are not sharpened)."/>
+                                        <TextBlock Grid.Column="2" Name="valSharpenStrength" Text="{Binding Value, ElementName=sldSharpenStrength, StringFormat=F2, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,5,0"/>
+                                    </Grid>
+
+                                </StackPanel>
+                            </Border>
+                            <!-- Camera -->
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Camera" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,15,0,5"/>
+                                <Grid Width="433">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="135"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="45"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Grid.Column="0" Content="Camera Distance:" VerticalAlignment="Center" ToolTip="The camera's distance from your character while playing, as a multiplier of the game's own distance.&#x0a;1.0 = vanilla (nothing is patched), below 1.0 closer, above 1.0 farther (0.5 to 2.0)."/>
+                                    <Slider Grid.Column="1" Name="sldCameraDistance" Minimum="0.5" Maximum="2" Value="1" TickFrequency="0.1" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Foreground="White" VerticalAlignment="Center" Margin="5,4" Tag="{Binding ElementName=valCameraDistance}" ValueChanged="sldCameraDistance_ValueChanged" ToolTip="The camera's distance from your character while playing, as a multiplier of the game's own distance.&#x0a;1.0 = vanilla (nothing is patched), below 1.0 closer, above 1.0 farther (0.5 to 2.0)."/>
+                                    <TextBlock Grid.Column="2" Name="valCameraDistance" Text="{Binding Value, ElementName=sldCameraDistance, StringFormat=F1, ConverterCulture=en-US}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,5,0"/>
+                                </Grid>
+                                <!-- Checked = cameraDistanceLockOn 0. Disabled (faded) while Camera Distance is 1.0 -->
+                                <CheckBox Name="chkKeepLockOnDistance" Content="Lock-On Distance changes in vanilla " Foreground="White" Margin="5,6,0,0" IsChecked="False" IsEnabled="False" ToolTip="On: the lock-on camera keeps the vanilla distance (it moves in when you lock on and back out when you let go).&#x0a;Off: the lock-on camera uses Camera Distance too.&#x0a;Nothing to change with Camera Distance 1.0.&#x0a;In DSfix.ini: cameraDistanceLockOn (On = 0, Off = 1)." Width="428">
+                                    <CheckBox.Style>
+                                        <Style TargetType="CheckBox">
+                                            <Style.Triggers>
+                                                <Trigger Property="IsEnabled" Value="False">
+                                                    <Setter Property="Opacity" Value="0.4"/>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </CheckBox.Style>
+                                </CheckBox>
+                            </StackPanel>
                         </Grid>
                         <Separator Height="6" Background="#FF736554" Margin="0,10,0,0"/>
                         <!-- Ambient Occlusion -->
@@ -178,7 +218,7 @@
                                 <ComboBoxItem Content="HBAO"/>
                                 <ComboBoxItem Content="SCAO"/>
                                 <ComboBoxItem Content="VSSAO2" IsSelected="True"/>
-                                
+
                             </ComboBox>
                         </WrapPanel>
                         <Separator Height="6" Background="#FF736554" Margin="0,10,0,0"/>
@@ -282,7 +322,12 @@
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="55"/>
                             </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
 
                             <Label Grid.Row="0" Grid.Column="0" Content="Menu/Inventory:" VerticalAlignment="Center"/>
                             <Slider Grid.Row="0" Grid.Column="1" Name="sldMenuScale" Minimum="0.5" Maximum="1" Value="1" TickFrequency="0.05" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Foreground="White" VerticalAlignment="Center" Margin="5,4" Tag="{Binding ElementName=valMenuScale}" ToolTip="Top right quick menu and the inventory/status windows."/>
@@ -521,7 +566,7 @@
                     </WrapPanel>
                     <CheckBox Name="chkDDTMControllerMappings" Content="Show Keyboard/Mouse alongside Controller icons (Only with DDTMControllerFix.dll)" Foreground="White" Margin="0,10,0,0" ToolTip="DSfix.ini: DDTMControllerMappings&#x0a;Only works with DDTMControllerFix.dll.&#x0a;Keyboard / mouse: the button prompts and the quick menu LB / RB icons show your keys from DDTMControllerMappings.ini.&#x0a;Controller: the face buttons, LB / RB and LT / RT show the real button mapped to them (for example A = R1 shows RB).&#x0a;While this is on, the two swap options above are not used."/>
                     <TextBlock Text="While it is on, the in-game icons switch between your keyboard / mouse keys and the controller icons, and follow your controller button mapping, so the two swap options above are not needed." Foreground="#A8A8A8" FontSize="12" TextWrapping="Wrap" Margin="20,2,0,0"/>
-                    
+
                 </StackPanel>
             </TabItem>
             <!-- 7. KEYS -->
@@ -581,6 +626,9 @@
                         <WrapPanel Margin="0,5,0,5" Height="172">
                             <CheckBox Name="chkKeyToggleSharpen" Content="Toggle Sharpen:" Width="200" Foreground="White" VerticalAlignment="Center" IsChecked="True" ToolTip="Turns the sharpening effect on/off in game (toggleSharpen in DSfixKeys.ini)."/>
                             <TextBox Name="txtKeyToggleSharpen" Width="120" Text="VK_F4" Margin="0,0,15,0"/>
+
+                            <CheckBox Name="chkKeyToggleCameraDistance" Content="Toggle Camera Distance:" Width="190" Foreground="White" VerticalAlignment="Center" IsChecked="True" ToolTip="Turns the Camera Distance setting (Graphics tab) on/off in game (toggleCameraDistance in DSfixKeys.ini)."/>
+                            <TextBox Name="txtKeyToggleCameraDistance" Width="120" Text="VK_F3"/>
                         </WrapPanel>
                         <WrapPanel>
 
