@@ -438,6 +438,7 @@ namespace DDTM_DSFixUI
                     case "BottomlessBoxMarkers": chkBottomlessBoxMarkers.IsChecked = value == "1"; break;
                     case "QuickSelectEstus": chkQuickSelectEstus.IsChecked = value == "1"; break;
                     case "BonfireCovenants": chkBonfireCovenants.IsChecked = value == "1"; break;
+                    case "gameMap": chkGameMap.IsChecked = value == "1"; break;
                     case "controllerIcons": if (value.Length > 0) SetComboBoxByValue(cmbControllerIcons, value.ToLowerInvariant()); break;
                 }
             }
@@ -492,7 +493,7 @@ namespace DDTM_DSFixUI
             {
 
                 chkUnlockFPS.IsChecked = true;
-                txtFpsLimit.Text = "60";
+                txtFpsLimit.Text = "30";
                 txtFpsThreshold.Text = "28";
                 cmbAaType.Text = "SMAA";
                 cmbAaQuality.SelectedIndex = 4; //Ultra
@@ -805,6 +806,7 @@ namespace DDTM_DSFixUI
                 $"BottomlessBoxMarkers={(chkBottomlessBoxMarkers.IsChecked == true ? "1" : "0")}",
                 $"QuickSelectEstus={(chkQuickSelectEstus.IsChecked == true ? "1" : "0")}",
                 $"BonfireCovenants={(chkBonfireCovenants.IsChecked == true ? "1" : "0")}",
+                $"gameMap={(chkGameMap.IsChecked == true ? "1" : "0")}",
 
                 // Keys mappings
                 $"toggleCursorCapture={txtKeyToggleCursorCapture.Text}|{chkKeyToggleCursorCapture.IsChecked}",
@@ -927,6 +929,7 @@ namespace DDTM_DSFixUI
                     case "BottomlessBoxMarkers": chkBottomlessBoxMarkers.IsChecked = value == "1"; break;
                     case "QuickSelectEstus": chkQuickSelectEstus.IsChecked = value == "1"; break;
                     case "BonfireCovenants": chkBonfireCovenants.IsChecked = value == "1"; break;
+                    case "gameMap": chkGameMap.IsChecked = value == "1"; break;
                     case "controllerIcons": if (value.Length > 0) SetComboBoxByValue(cmbControllerIcons, value.ToLowerInvariant()); break;
 
                     default:
@@ -1065,6 +1068,7 @@ namespace DDTM_DSFixUI
                     case "BottomlessBoxMarkers": lines[i] = $"BottomlessBoxMarkers {(chkBottomlessBoxMarkers.IsChecked == true ? "1" : "0")}"; break;   // never appended
                     case "QuickSelectEstus": lines[i] = $"QuickSelectEstus {(chkQuickSelectEstus.IsChecked == true ? "1" : "0")}"; break;   // never appended
                     case "BonfireCovenants": lines[i] = $"BonfireCovenants {(chkBonfireCovenants.IsChecked == true ? "1" : "0")}"; break;   // never appended
+                    case "gameMap": lines[i] = $"gameMap {(chkGameMap.IsChecked == true ? "1" : "0")}"; break;   // never appended
                     case "controllerIcons": if (cmbControllerIcons.SelectedItem != null) lines[i] = $"controllerIcons {GetComboBoxValue(cmbControllerIcons)}"; break;   // never appended: older DSfix.ini files do not have it
                 }
             }
@@ -1205,23 +1209,13 @@ namespace DDTM_DSFixUI
                 MessageBox.Show("DARKSOULS.exe was not found in the current folder.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
-        private void chkUnlockFPS_Unchecked(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("If you do not unlock the framerate (unlockFPS), the game will not use the optimized DSFix code for a smooth framerate.", "FPS Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
-        }
-
         private void TxtFpsLimit_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
             if (string.IsNullOrEmpty(txtFpsLimit.Text)) return;
 
             if (int.TryParse(txtFpsLimit.Text, out int value))
             {
-                if (value > 144)
-                {
-                    txtFpsLimit.Text = "144";
-                    txtFpsLimit.CaretIndex = txtFpsLimit.Text.Length;
-                }
-                else if (value < 1)
+                if (value < 1)
                 {
                     txtFpsLimit.Text = "1";
                     txtFpsLimit.CaretIndex = txtFpsLimit.Text.Length;

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DDTM_DSFixUI"
         mc:Ignorable="d"
-        Title="DDTM DSFix 3.0 UI SETTINGS    V2.6.0" Height="882" Width="1000" WindowStartupLocation="CenterScreen" Icon="icofdsfix3.ico">
+        Title="DDTM DSFix 3.0 UI SETTINGS    V2.7.0" Height="882" Width="1000" WindowStartupLocation="CenterScreen" Icon="icofdsfix3.ico">
 
     <Window.Resources>
         <!-- Dark Souls Theme Styles -->
@@ -118,9 +118,9 @@
                         <!-- Framerate -->
                         <TextBlock Text="Framerate" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,15,0,5"/>
                         <WrapPanel>
-                            <CheckBox Name="chkUnlockFPS" Content="Unlock FPS" Foreground="White" Margin="5,5,15,5" IsChecked="True" ToolTip="Enables variable framerate." Unchecked="chkUnlockFPS_Unchecked"/>
+                            <CheckBox Name="chkUnlockFPS" Content="Unlock FPS" Foreground="White" Margin="5,5,15,5" IsChecked="True" ToolTip="0 = DSfix does not change the game's frame rate or timing at all.&#x0a;0Use 0 when another mod unlocks the frame rate and fixes the high-FPS bugs.&#x0a;01 = DSfix unlocks the frame rate up to FPSlimit. Above 30 FPS DSfix also fixes:&#x0a;0slide steering and slide start on steep slopes, the cutscene camera,&#x0a;0the soul counter and the Blighttown swamp poison build-up.&#x0a;0Other high-FPS bugs of the game are NOT fixed by DSfix: for those,&#x0a;0use another FPS mod and set unlockFPS 0."/>
                             <Label Content="FPS Limit:"/>
-                            <TextBox Name="txtFpsLimit" Width="50" Text="60" Margin="0,0,15,0" ToolTip="Cap framerate. Maximum recommended is 144." TextChanged="TxtFpsLimit_TextChanged"/>
+                            <TextBox Name="txtFpsLimit" Width="50" Text="30" Margin="0,0,15,0" ToolTip="Cap framerate. To play at more than 30 FPS with no problems, you must combine this with another mod that fixes high-FPS bugs. Uncheck 'Unlock FPS' if you are using another mod for FPS." TextChanged="TxtFpsLimit_TextChanged"/>
                             <Label Content="FPS Threshold:"/>
                             <TextBox Name="txtFpsThreshold" Width="50" Text="20" ToolTip="Dynamically disables AA if framerate drops below this."/>
                         </WrapPanel>
@@ -359,6 +359,7 @@
                         <CheckBox Name="chkDurabilityBars" Content="Show weapon durability bars (Dark Souls III Style)" Foreground="White" Margin="0,5,0,0" ToolTip="Thin bar under each weapon slot showing durability left (bottom-left HUD)."/>
                         <CheckBox Name="chkWeaponsArmorSort" Content="Sort Weapons and Armor lists (Inventory, Equipment and Bottomless Box)" Foreground="White" Margin="0,5,0,0" ToolTip="Sort the Weapons and Armor lists of the Inventory, the Equipment and the Bottomless Box.&#x0a;Values: Game Order, physical, magic, fire, lightning, durability, weight, and in the Bottomless Box also Storage.&#x0a;The choice is remembered in %LOCALAPPDATA%\NBGI\DarkSouls\DSfixSort.ini"/>
                         <CheckBox Name="chkBottomlessBoxMarkers" Content="Bottomless Box markers (Storage icon on items that are only in the box)" Foreground="White" Margin="0,5,0,0" ToolTip="In the Bottomless Box list, a small chest picture in the top-right corner of an item's picture&#x0a;when nothing of it is held and all of it is in the box."/>
+                        <CheckBox Name="chkGameMap" Content="Bonfire World Map" Foreground="White" Margin="0,5,0,0" ToolTip="Open the gesture window (Back) while you play and a map appears next to it.&#x0a;Shows only the path you have explored, your lit bonfires and your soul remains direction if you died.&#x0a;&#x0a;The explored ground is kept per character in DSfixMap.dat next to the save file."/>
                         <Separator Height="6" Background="#FF736554" Margin="0,15,0,0"/>
 
                         <!-- Bulk item use -->
