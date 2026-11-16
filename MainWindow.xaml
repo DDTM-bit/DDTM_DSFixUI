@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DDTM_DSFixUI"
         mc:Ignorable="d"
-        Title="DDTM DSFix 3.0 UI SETTINGS    V2.7.0" Height="882" Width="1000" WindowStartupLocation="CenterScreen" Icon="icofdsfix3.ico">
+        Title="DDTM DSFix 3.0 UI SETTINGS    V2.8.0" Height="882" Width="1000" WindowStartupLocation="CenterScreen" Icon="icofdsfix3.ico">
 
     <Window.Resources>
         <!-- Dark Souls Theme Styles -->
