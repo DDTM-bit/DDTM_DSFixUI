@@ -439,6 +439,7 @@ namespace DDTM_DSFixUI
                     case "QuickSelectEstus": chkQuickSelectEstus.IsChecked = value == "1"; break;
                     case "BonfireCovenants": chkBonfireCovenants.IsChecked = value == "1"; break;
                     case "gameMap": chkGameMap.IsChecked = value == "1"; break;
+                    case "NewItemMarkers": chkNewItemMarkers.IsChecked = value == "1"; break;
                     case "controllerIcons": if (value.Length > 0) SetComboBoxByValue(cmbControllerIcons, value.ToLowerInvariant()); break;
                 }
             }
@@ -807,6 +808,7 @@ namespace DDTM_DSFixUI
                 $"QuickSelectEstus={(chkQuickSelectEstus.IsChecked == true ? "1" : "0")}",
                 $"BonfireCovenants={(chkBonfireCovenants.IsChecked == true ? "1" : "0")}",
                 $"gameMap={(chkGameMap.IsChecked == true ? "1" : "0")}",
+                $"NewItemMarkers={(chkNewItemMarkers.IsChecked == true ? "1" : "0")}",
 
                 // Keys mappings
                 $"toggleCursorCapture={txtKeyToggleCursorCapture.Text}|{chkKeyToggleCursorCapture.IsChecked}",
@@ -930,6 +932,7 @@ namespace DDTM_DSFixUI
                     case "QuickSelectEstus": chkQuickSelectEstus.IsChecked = value == "1"; break;
                     case "BonfireCovenants": chkBonfireCovenants.IsChecked = value == "1"; break;
                     case "gameMap": chkGameMap.IsChecked = value == "1"; break;
+                    case "NewItemMarkers": chkNewItemMarkers.IsChecked = value == "1"; break;
                     case "controllerIcons": if (value.Length > 0) SetComboBoxByValue(cmbControllerIcons, value.ToLowerInvariant()); break;
 
                     default:
@@ -1069,6 +1072,7 @@ namespace DDTM_DSFixUI
                     case "QuickSelectEstus": lines[i] = $"QuickSelectEstus {(chkQuickSelectEstus.IsChecked == true ? "1" : "0")}"; break;   // never appended
                     case "BonfireCovenants": lines[i] = $"BonfireCovenants {(chkBonfireCovenants.IsChecked == true ? "1" : "0")}"; break;   // never appended
                     case "gameMap": lines[i] = $"gameMap {(chkGameMap.IsChecked == true ? "1" : "0")}"; break;   // never appended
+                    case "NewItemMarkers": lines[i] = $"NewItemMarkers {(chkNewItemMarkers.IsChecked == true ? "1" : "0")}"; break;   // never appended
                     case "controllerIcons": if (cmbControllerIcons.SelectedItem != null) lines[i] = $"controllerIcons {GetComboBoxValue(cmbControllerIcons)}"; break;   // never appended: older DSfix.ini files do not have it
                 }
             }
