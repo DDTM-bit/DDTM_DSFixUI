@@ -389,6 +389,7 @@
                         <!-- Covenants -->
                         <TextBlock Text="Covenants" Foreground="#FF8C00" FontSize="16" FontWeight="Bold" Margin="0,15,0,5"/>
                         <CheckBox Name="chkCovenantOfferings" Content="Offer several items at once to a covenant" Foreground="White" Margin="0,5,0,0" ToolTip="Offer several at once to a covenant.&#x0a;The &quot;Offer ...?&quot; question at an altar or covenant leader becomes the game's own number picker, and the chosen number of items (or of humanity) is offered in one step.&#x0a;The picker never offers enough to reach the next covenant rank, so the offering that ranks you up is always the game's own single question and its reward arrives exactly as before."/>
+                        <CheckBox Name="chkCovenantPoints" Content="Show Covenant Points" Foreground="White" Margin="0,5,0,0" ToolTip="Your covenant points after the covenant name.&#x0a;In the menus (Inventory, Equipment, Status).&#x0a;In the bonfire covenant list: points + rank."/>
                         <CheckBox Name="chkBonfireCovenants" Content="Bonfire change covenant" Foreground="White" Margin="0,5,0,0" ToolTip="&quot;Enter Covenant&quot; in the bonfire list: switch to a covenant you already joined in this playthrough.&#x0a;Same Yes/No question and result as the leaders (the devotion of the covenant you leave is halved).&#x0a;Broken covenants (leader dead or hostile, banished, ...) are not offered. Resets in NG+."/>
                     </StackPanel>
                 </ScrollViewer>

@@ -441,6 +441,7 @@ namespace DDTM_DSFixUI
                     case "gameMap": chkGameMap.IsChecked = value == "1"; break;
                     case "NewItemMarkers": chkNewItemMarkers.IsChecked = value == "1"; break;
                     case "EquipmentLoadouts": chkEquipmentLoadouts.IsChecked = value == "1"; break;
+                    case "CovenantPoints": chkCovenantPoints.IsChecked = value == "1"; break;
                     case "controllerIcons": if (value.Length > 0) SetComboBoxByValue(cmbControllerIcons, value.ToLowerInvariant()); break;
                 }
             }
@@ -811,6 +812,7 @@ namespace DDTM_DSFixUI
                 $"gameMap={(chkGameMap.IsChecked == true ? "1" : "0")}",
                 $"NewItemMarkers={(chkNewItemMarkers.IsChecked == true ? "1" : "0")}",
                 $"EquipmentLoadouts={(chkEquipmentLoadouts.IsChecked == true ? "1" : "0")}",
+                $"CovenantPoints={(chkCovenantPoints.IsChecked == true ? "1" : "0")}",
 
                 // Keys mappings
                 $"toggleCursorCapture={txtKeyToggleCursorCapture.Text}|{chkKeyToggleCursorCapture.IsChecked}",
@@ -936,6 +938,7 @@ namespace DDTM_DSFixUI
                     case "gameMap": chkGameMap.IsChecked = value == "1"; break;
                     case "NewItemMarkers": chkNewItemMarkers.IsChecked = value == "1"; break;
                     case "EquipmentLoadouts": chkEquipmentLoadouts.IsChecked = value == "1"; break;
+                    case "CovenantPoints": chkCovenantPoints.IsChecked = value == "1"; break;
                     case "controllerIcons": if (value.Length > 0) SetComboBoxByValue(cmbControllerIcons, value.ToLowerInvariant()); break;
 
                     default:
@@ -1077,6 +1080,7 @@ namespace DDTM_DSFixUI
                     case "gameMap": lines[i] = $"gameMap {(chkGameMap.IsChecked == true ? "1" : "0")}"; break;   // never appended
                     case "NewItemMarkers": lines[i] = $"NewItemMarkers {(chkNewItemMarkers.IsChecked == true ? "1" : "0")}"; break;   // never appended
                     case "EquipmentLoadouts": lines[i] = $"EquipmentLoadouts {(chkEquipmentLoadouts.IsChecked == true ? "1" : "0")}"; break;   // never appended
+                    case "CovenantPoints": lines[i] = $"CovenantPoints {(chkCovenantPoints.IsChecked == true ? "1" : "0")}"; break;   // never appended
                     case "controllerIcons": if (cmbControllerIcons.SelectedItem != null) lines[i] = $"controllerIcons {GetComboBoxValue(cmbControllerIcons)}"; break;   // never appended: older DSfix.ini files do not have it
                 }
             }
